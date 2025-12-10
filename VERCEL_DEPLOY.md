@@ -51,11 +51,12 @@ NEXT_PUBLIC_BASE_URL=https://tu-dominio.vercel.app
    - Copia la `DATABASE_URL` completa a las variables de entorno
 
 4. **Ejecuta las migraciones de Prisma**
-   - En Vercel, ve a Settings > Build & Development Settings
-   - Agrega un Build Command personalizado:
+   - El archivo `vercel.json` ya está configurado con el build command correcto
+   - Alternativamente, puedes configurarlo en Settings > Build & Development Settings:
    ```
-   npx prisma generate && npx prisma db push && npm run build
+   prisma generate && next build
    ```
+   - **Nota:** El script `postinstall` en `package.json` ejecutará `prisma generate` automáticamente después de `npm install`
 
 5. **Configura el Webhook de Mercado Pago**
    - Una vez desplegado, copia la URL de tu API:
