@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("USER")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SolicitudVisita {
+  id        String   @id @default(cuid())
+  nombre    String
+  email     String
+  telefono  String
+  direccion String
+  localidad String?
+  mensaje   String?
+  estado    String   @default("PENDIENTE")
+  notas     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SolicitudPresupuesto {
+  id        String   @id @default(cuid())
+  nombre    String
+  email     String
+  telefono  String
+  productos String   // JSON string con productos y medidas
+  estado    String   @default("PENDIENTE")
+  notas     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SolicitudContacto {
+  id        String   @id @default(cuid())
+  nombre    String
+  email     String
+  telefono  String?
+  mensaje   String
+  estado    String   @default("PENDIENTE")
+  notas     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ConfiguracionFormulario {
+  id                String   @id @default(cuid())
+  nombreFormulario  String   @unique
+  emailDestino      String
+  asuntoEmail       String
+  mensajeExito      String
+  activo            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Configuracion {
+  id        String   @id @default(cuid())
+  clave     String   @unique
+  valor     String   // JSON string para valores complejos
+  tipo      String   @default("texto") // texto, json, booleano, numero
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HeroBanner {
+  id          String   @id @default(cuid())
+  titulo      String
+  subtitulo   String
+  imagen      String
+  features    String   // JSON array con features [{title, desc}]
+  ubicacion   String?
+  categoria   String?
+  orden       Int      @default(0)
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Pago {
+  id                  String   @id @default(cuid())
+  cliente             String
+  idCliente           String?
+  idPedido            String?
+  monto               Float
+  maxCuotas           Int      @default(1)
+  estado              String   @default("GENERADO") // GENERADO, APROBADO, RECHAZADO
+  token               String   @unique // Token único para la URL de pago
+  mercadoPagoId       String?  // ID de la preferencia de Mercado Pago
+  mercadoPagoInitPoint String? // URL de pago de Mercado Pago
+  mercadoPagoStatus   String?  // Estado del pago en Mercado Pago
+  fechaPago           DateTime? // Fecha cuando se aprobó el pago
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}

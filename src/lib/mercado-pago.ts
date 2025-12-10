@@ -1,0 +1,110 @@
+import { MercadoPagoConfig, Preference } from 'mercadopago'
+
+// Inicializar cliente de Mercado Pago
+const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN
+
+if (!accessToken) {
+  console.warn('⚠️ MERCADOPAGO_ACCESS_TOKEN no está configurado en las variables de entorno')
+}
+
+const client = new MercadoPagoConfig({
+  accessToken: accessToken || '',
+  options: {
+    timeout: 5000,
+    idempotencyKey: 'abc',
+  },
+})
+
+export const preference = new Preference(client)
+
+// Función para generar un token único para la URL de pago
+export function generatePaymentToken(): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  let token = ''
+  for (let i = 0; i < 20; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return token
+}
+
+// Función para crear una preferencia de pago en Mercado Pago
+export async function createMercadoPagoPreference(data: {
+  monto: number
+  cliente: string
+  idPedido?: string
+  maxCuotas: number
+  token: string
+}) {
+  try {
+    // Usar VERCEL_URL si está disponible (automático en Vercel), sino NEXT_PUBLIC_BASE_URL
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000')
+    
+    const successUrl = `${baseUrl}/pagar/${data.token}?status=success`
+    const failureUrl = `${baseUrl}/pagar/${data.token}?status=failure`
+    const pendingUrl = `${baseUrl}/pagar/${data.token}?status=pending`
+    
+    const preferenceData: any = {
+      items: [
+        {
+          id: data.token,
+          title: `Pago - ${data.cliente}${data.idPedido ? ` (Pedido ${data.idPedido})` : ''}`,
+          quantity: 1,
+          unit_price: data.monto,
+          currency_id: 'ARS',
+        },
+      ],
+      payer: {
+        name: data.cliente,
+      },
+      payment_methods: {
+        installments: data.maxCuotas,
+        excluded_payment_types: [],
+        excluded_payment_methods: [],
+      },
+      back_urls: {
+        success: successUrl,
+        failure: failureUrl,
+        pending: pendingUrl,
+      },
+      external_reference: data.token,
+    }
+    
+    // Solo agregar auto_return si la URL es HTTPS (producción)
+    if (baseUrl.startsWith('https://')) {
+      preferenceData.auto_return = 'approved'
+    }
+    
+    // Solo agregar notification_url si la URL es HTTPS (producción)
+    if (baseUrl.startsWith('https://')) {
+      preferenceData.notification_url = `${baseUrl}/api/pagos/mercado-pago/webhook`
+    }
+    
+    // Validar que las URLs sean válidas
+    if (!preferenceData.back_urls.success) {
+      throw new Error('back_urls.success es requerido')
+    }
+
+    console.log('Creating preference with data:', JSON.stringify(preferenceData, null, 2))
+    
+    const response = await preference.create({ body: preferenceData })
+    
+    // El SDK de Mercado Pago devuelve la respuesta en response o response.body
+    const responseData = (response as any).body || response
+    
+    // Log para debugging
+    console.log('Mercado Pago SDK response:', JSON.stringify(responseData, null, 2))
+    
+    // Retornar la respuesta con la estructura correcta
+    return {
+      id: responseData.id,
+      init_point: responseData.init_point || responseData.initPoint,
+      ...responseData
+    }
+  } catch (error) {
+    console.error('Error creating Mercado Pago preference:', error)
+    throw error
+  }
+}
+

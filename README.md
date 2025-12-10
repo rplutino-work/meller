@@ -1,36 +1,130 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MeleRoller - Sitio Web y Panel de Administración
 
-## Getting Started
+Réplica del sitio web [meleroller.com.ar](https://www.meleroller.com.ar/) con panel de administración para gestionar formularios y solicitudes.
 
-First, run the development server:
+## 🚀 Tecnologías
+
+- **Frontend:** Next.js 16, React, TypeScript
+- **Estilos:** Tailwind CSS
+- **Animaciones:** Framer Motion
+- **Base de datos:** SQLite con Prisma ORM
+- **Autenticación:** NextAuth.js
+- **Formularios:** React Hook Form + Zod
+- **Iconos:** Lucide React
+
+## 📦 Instalación
 
 ```bash
+# Instalar dependencias
+npm install
+
+# Configurar variables de entorno
+cp .env.example .env
+
+# Crear base de datos
+npx prisma migrate dev
+
+# Sembrar datos iniciales (usuario admin y ejemplos)
+npx ts-node scripts/seed.ts
+
+# Iniciar servidor de desarrollo
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔐 Acceso al Panel de Administración
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+URL: `http://localhost:3000/admin`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Credenciales de demo:**
+- Email: `admin@meleroller.com.ar`
+- Contraseña: `admin123`
 
-## Learn More
+## 📁 Estructura del Proyecto
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/
+│   ├── (public)/           # Páginas públicas
+│   │   ├── page.tsx        # Home
+│   │   ├── blackout/       # Productos
+│   │   ├── sunscreen/
+│   │   ├── romanas/
+│   │   ├── orientales/
+│   │   ├── tradicionales/
+│   │   ├── eclipse/
+│   │   ├── bandas-verticales/
+│   │   ├── sillones/
+│   │   ├── toldos/
+│   │   └── contacto/
+│   ├── admin/              # Panel de administración
+│   │   ├── page.tsx        # Dashboard
+│   │   ├── visitas/        # Gestión de visitas
+│   │   ├── presupuestos/   # Gestión de presupuestos
+│   │   ├── configuracion/  # Configuración
+│   │   └── login/
+│   └── api/                # API Routes
+│       ├── auth/
+│       └── solicitudes/
+├── components/
+│   ├── layout/             # Header, Footer
+│   ├── home/               # Componentes del home
+│   ├── forms/              # Formularios
+│   └── modals/             # Modales
+├── lib/
+│   └── prisma.ts
+└── auth.ts
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ✨ Funcionalidades
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Sitio Público
+- ✅ Página principal con slider de proyectos
+- ✅ Páginas de productos (BlackOut, SunScreen, etc.)
+- ✅ Formulario de solicitud de visita
+- ✅ Cotizador online
+- ✅ Modal "Cómo medir tu ventana"
+- ✅ Diseño responsive
+- ✅ Animaciones y transiciones
 
-## Deploy on Vercel
+### Panel de Administración
+- ✅ Dashboard con estadísticas
+- ✅ Gestión de solicitudes de visita
+- ✅ Gestión de solicitudes de presupuesto
+- ✅ Cambio de estado (Pendiente → En proceso → Completado)
+- ✅ Exportar a CSV
+- ✅ Filtros y búsqueda
+- ✅ Contacto directo por WhatsApp/Email
+- ✅ Configuración de formularios
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🖼️ Imágenes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Agregar las imágenes en las siguientes carpetas:
+
+```
+public/images/
+├── projects/
+│   ├── bmw.jpg
+│   ├── embajada.jpg
+│   ├── fontenla.jpg
+│   ├── boom.jpg
+│   └── nordelta.jpg
+└── products/
+    ├── blackout.jpg
+    ├── blackout-hero.jpg
+    ├── sunscreen.jpg
+    ├── sunscreen-hero.jpg
+    ├── romanas.jpg
+    ├── orientales.jpg
+    ├── tradicionales.jpg
+    ├── eclipse.jpg
+    ├── bandas.jpg
+    └── toldos.jpg
+```
+
+## 📝 Licencia
+
+Este proyecto es una réplica con fines educativos y de desarrollo freelance.
+
+## 🤝 Contacto
+
+Para consultas sobre el desarrollo: [tu-email@ejemplo.com]
