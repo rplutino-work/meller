@@ -13,32 +13,49 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
+    console.log('Webhook recibido:', JSON.stringify(body, null, 2))
+    
     // Mercado Pago puede enviar diferentes tipos de notificaciones
     // Tipo 1: { type: 'payment', data: { id: '...' } }
     // Tipo 2: { action: 'payment.created', data: { id: '...' } }
     // Tipo 3: { id: '...', type: 'payment' } (notificación directa)
+    // Tipo 4: { data: { id: '...' } } (notificación simple)
     
     let paymentId: string | null = null
     
     if (body.type === 'payment' && body.data?.id) {
-      paymentId = body.data.id
+      paymentId = body.data.id.toString()
     } else if (body.action === 'payment.created' && body.data?.id) {
-      paymentId = body.data.id
+      paymentId = body.data.id.toString()
     } else if (body.id && body.type === 'payment') {
-      paymentId = body.id
+      paymentId = body.id.toString()
+    } else if (body.data?.id) {
+      paymentId = body.data.id.toString()
     }
 
     if (!paymentId) {
-      console.log('Webhook recibido sin payment ID:', body)
+      console.log('Webhook recibido sin payment ID válido:', body)
+      // Retornar 200 para que Mercado Pago no reintente
       return NextResponse.json({ received: true, message: 'No payment ID found' })
     }
 
+    console.log(`Procesando webhook para payment ID: ${paymentId}`)
+
     // Obtener información del pago desde Mercado Pago
-    const paymentInfo = await payment.get({ id: paymentId })
+    let paymentInfo
+    try {
+      paymentInfo = await payment.get({ id: paymentId })
+      console.log('Payment info obtenida:', JSON.stringify(paymentInfo, null, 2))
+    } catch (error: any) {
+      console.error('Error obteniendo payment info:', error.message)
+      return NextResponse.json({ received: true, error: 'Error fetching payment' }, { status: 200 })
+    }
 
     if (paymentInfo && paymentInfo.external_reference) {
       const token = paymentInfo.external_reference
       const status = paymentInfo.status
+
+      console.log(`Actualizando pago ${token} con estado: ${status}`)
 
       // Mapear estados de Mercado Pago a nuestros estados
       let estado = 'GENERADO'
@@ -49,26 +66,36 @@ export async function POST(request: NextRequest) {
       }
 
       // Actualizar el pago en la base de datos
-      await prisma.pago.update({
-        where: { token },
-        data: {
-          estado,
-          mercadoPagoStatus: status,
-          fechaPago: status === 'approved' ? new Date() : null,
-        },
-      })
+      try {
+        await prisma.pago.update({
+          where: { token },
+          data: {
+            estado,
+            mercadoPagoId: paymentInfo.id?.toString() || null,
+            mercadoPagoStatus: status || null,
+            fechaPago: status === 'approved' ? new Date() : null,
+          },
+        })
 
-      console.log(`Pago ${token} actualizado a estado: ${estado}`)
+        console.log(`✅ Pago ${token} actualizado a estado: ${estado}`)
+      } catch (dbError: any) {
+        console.error('Error actualizando en BD:', dbError.message)
+        // Continuar y retornar 200 para que Mercado Pago no reintente
+      }
     } else {
-      console.log('Payment info sin external_reference:', paymentInfo)
+      console.log('⚠️ Payment info sin external_reference:', {
+        hasPaymentInfo: !!paymentInfo,
+        externalReference: paymentInfo?.external_reference,
+        paymentId: paymentInfo?.id
+      })
     }
 
-    return NextResponse.json({ received: true })
-  } catch (error) {
-    console.error('Error processing webhook:', error)
+    return NextResponse.json({ received: true, processed: true })
+  } catch (error: any) {
+    console.error('Error processing webhook:', error.message, error.stack)
     // Retornar 200 para que Mercado Pago no reintente
     return NextResponse.json(
-      { received: true, error: 'Error al procesar el webhook' },
+      { received: true, error: 'Error al procesar el webhook', message: error.message },
       { status: 200 }
     )
   }

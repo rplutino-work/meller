@@ -60,37 +60,44 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { cliente, idCliente, idPedido, monto, maxCuotas, estado } = body
+    const { cliente, idCliente, idPedido, monto, maxCuotas, estado, metodoPago } = body
 
     // Generar token único
     const token = generatePaymentToken()
 
-    // Crear preferencia en Mercado Pago
+    // Crear preferencia en Mercado Pago solo si es método checkout
     let mercadoPagoId: string | null = null
     let mercadoPagoInitPoint: string | null = null
 
-    try {
-      const preference = await createMercadoPagoPreference({
-        monto: parseFloat(monto),
-        cliente,
-        idPedido,
-        maxCuotas: parseInt(maxCuotas) || 1,
-        token,
-      })
-      
-      // Log para debugging
-      console.log('Mercado Pago preference response:', JSON.stringify(preference, null, 2))
-      
-      // Acceder a los campos correctamente según la estructura de la respuesta
-      mercadoPagoId = preference.id || null
-      mercadoPagoInitPoint = preference.init_point || null
-      
-      console.log('Mercado Pago ID:', mercadoPagoId)
-      console.log('Mercado Pago Init Point:', mercadoPagoInitPoint)
-    } catch (error: any) {
-      console.error('Error creating Mercado Pago preference:', error)
-      console.error('Error details:', error.message, error.response?.data || error.body)
-      // Continuar creando el pago aunque falle Mercado Pago
+    if (metodoPago === 'checkout' || !metodoPago) {
+      // Método Checkout: crear preferencia y generar link
+      try {
+        const preference = await createMercadoPagoPreference({
+          monto: parseFloat(monto),
+          cliente,
+          idPedido,
+          maxCuotas: parseInt(maxCuotas) || 1,
+          token,
+        })
+        
+        // Log para debugging
+        console.log('Mercado Pago preference response:', JSON.stringify(preference, null, 2))
+        
+        // Acceder a los campos correctamente según la estructura de la respuesta
+        mercadoPagoId = preference.id || null
+        mercadoPagoInitPoint = preference.init_point || null
+        
+        console.log('Mercado Pago ID:', mercadoPagoId)
+        console.log('Mercado Pago Init Point:', mercadoPagoInitPoint)
+      } catch (error: any) {
+        console.error('Error creating Mercado Pago preference:', error)
+        console.error('Error details:', error.message, error.response?.data || error.body)
+        // Continuar creando el pago aunque falle Mercado Pago
+      }
+    } else if (metodoPago === 'gateway') {
+      // Método Gateway: el pago se procesará directamente con tarjeta
+      // No creamos preferencia, el pago se procesará cuando se reciban los datos de la tarjeta
+      console.log('Pago creado con método Gateway - se procesará directamente con tarjeta')
     }
 
     // Crear pago en la base de datos

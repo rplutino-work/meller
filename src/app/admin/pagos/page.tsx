@@ -14,7 +14,8 @@ import {
   Clock,
   ArrowLeft,
   Trash2,
-  Save
+  Save,
+  ExternalLink
 } from 'lucide-react'
 
 interface Pago {
@@ -61,6 +62,7 @@ export default function PagosPage() {
     monto: '',
     maxCuotas: '1',
     estado: 'GENERADO',
+    metodoPago: 'checkout', // 'checkout' o 'gateway'
   })
 
   useEffect(() => {
@@ -95,6 +97,7 @@ export default function PagosPage() {
       monto: '',
       maxCuotas: '1',
       estado: 'GENERADO',
+      metodoPago: 'checkout',
     })
     setModalOpen(true)
   }
@@ -109,6 +112,7 @@ export default function PagosPage() {
       monto: pago.monto.toString(),
       maxCuotas: pago.maxCuotas.toString(),
       estado: pago.estado,
+      metodoPago: 'checkout', // Los pagos existentes usan checkout
     })
     setModalOpen(true)
   }
@@ -341,24 +345,44 @@ export default function PagosPage() {
                           </span>
                         </td>
                         <td style={{ padding: '12px 16px' }}>
-                          <button
-                            onClick={() => copyToClipboard(paymentUrl)}
-                            style={{
-                              padding: '6px 12px',
-                              background: '#f1f5f9',
-                              border: '1px solid #e5e7eb',
-                              borderRadius: '6px',
-                              fontSize: '12px',
-                              cursor: 'pointer',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              color: '#374151'
-                            }}
-                          >
-                            <Copy size={14} />
-                            Copiar
-                          </button>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <button
+                              onClick={() => window.open(paymentUrl, '_blank')}
+                              style={{
+                                padding: '6px 12px',
+                                background: '#3b82f6',
+                                border: 'none',
+                                borderRadius: '6px',
+                                fontSize: '12px',
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                color: 'white'
+                              }}
+                            >
+                              <ExternalLink size={14} />
+                              Ir
+                            </button>
+                            <button
+                              onClick={() => copyToClipboard(paymentUrl)}
+                              style={{
+                                padding: '6px 12px',
+                                background: '#f1f5f9',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '6px',
+                                fontSize: '12px',
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                color: '#374151'
+                              }}
+                            >
+                              <Copy size={14} />
+                              Copiar
+                            </button>
+                          </div>
                         </td>
                         <td style={{ padding: '12px 16px' }}>
                           <button
@@ -631,6 +655,36 @@ export default function PagosPage() {
                       <option value="18">18</option>
                     </select>
                   </div>
+
+                  {isCreating && (
+                    <div>
+                      <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px' }}>
+                        Método de Pago
+                      </label>
+                      <select
+                        value={formData.metodoPago}
+                        onChange={(e) => setFormData({ ...formData, metodoPago: e.target.value })}
+                        style={{
+                          width: '100%',
+                          padding: '10px 14px',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          outline: 'none',
+                          fontFamily: 'inherit',
+                          background: 'white'
+                        }}
+                      >
+                        <option value="checkout">Checkout (Link de Pago)</option>
+                        <option value="gateway">Gateway (Pago Directo con Tarjeta)</option>
+                      </select>
+                      <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+                        {formData.metodoPago === 'checkout' 
+                          ? 'Genera un link que el cliente puede usar para pagar'
+                          : 'Procesa el pago directamente con los datos de la tarjeta (requiere tokenización)'}
+                      </p>
+                    </div>
+                  )}
 
                   {!isCreating && (
                     <div>

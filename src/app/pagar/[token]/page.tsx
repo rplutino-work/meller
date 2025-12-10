@@ -26,6 +26,8 @@ export default function PagarPage() {
   const searchParams = useSearchParams()
   const token = params.token as string
   const status = searchParams.get('status')
+  const collectionStatus = searchParams.get('collection_status')
+  const paymentId = searchParams.get('payment_id')
   
   const [pago, setPago] = useState<Pago | null>(null)
   const [loading, setLoading] = useState(true)
@@ -39,13 +41,47 @@ export default function PagarPage() {
   }, [token])
 
   useEffect(() => {
-    if (status === 'success' && pago) {
-      // Verificar el estado del pago después de un momento
+    // Si hay parámetros de respuesta de Mercado Pago, actualizar el estado
+    if ((status === 'success' || status === 'approved' || collectionStatus === 'approved') && token) {
+      // Actualizar el estado del pago desde la API
+      updatePaymentStatus()
+    }
+  }, [status, collectionStatus, token])
+
+  async function updatePaymentStatus() {
+    try {
+      // Si hay payment_id, actualizar el estado del pago
+      if (paymentId && token) {
+        const res = await fetch(`/api/pagos/update-status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            token,
+            paymentId,
+            status: collectionStatus || status,
+          }),
+        })
+        
+        if (res.ok) {
+          // Recargar el pago después de actualizar
+          setTimeout(() => {
+            fetchPago()
+          }, 1000)
+        }
+      } else {
+        // Si no hay payment_id, solo recargar después de un momento
+        setTimeout(() => {
+          fetchPago()
+        }, 2000)
+      }
+    } catch (err) {
+      console.error('Error updating payment status:', err)
+      // Aún así, recargar el pago
       setTimeout(() => {
         fetchPago()
       }, 2000)
     }
-  }, [status, pago])
+  }
 
   async function fetchPago() {
     try {
@@ -161,7 +197,7 @@ export default function PagarPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#f8fafc',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
         padding: '24px'
       }}>
@@ -171,31 +207,71 @@ export default function PagarPage() {
           padding: '48px',
           textAlign: 'center',
           maxWidth: '500px',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
         }}>
-          <CheckCircle2 size={64} style={{ color: '#10b981', margin: '0 auto 24px' }} />
-          <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1e293b', marginBottom: '12px' }}>
-            Pago Aprobado
+          <div style={{
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            background: '#d1fae5',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 24px'
+          }}>
+            <CheckCircle2 size={48} style={{ color: '#10b981' }} />
+          </div>
+          <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#1e293b', marginBottom: '12px' }}>
+            ¡Pago Aprobado!
           </h1>
-          <p style={{ color: '#64748b', marginBottom: '24px' }}>
-            Tu pago de {formatCurrency(pago.monto)} ha sido procesado exitosamente.
+          <p style={{ color: '#64748b', marginBottom: '24px', fontSize: '16px' }}>
+            Tu pago de <strong style={{ color: '#1e293b' }}>{formatCurrency(pago.monto)}</strong> ha sido procesado exitosamente.
           </p>
           {pago.fechaPago && (
-            <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '24px' }}>
-              Fecha de pago: {formatDate(pago.fechaPago)}
-            </p>
+            <div style={{
+              background: '#f8fafc',
+              borderRadius: '8px',
+              padding: '16px',
+              marginBottom: '24px'
+            }}>
+              <p style={{ color: '#94a3b8', fontSize: '12px', margin: 0, marginBottom: '4px' }}>
+                Fecha de pago
+              </p>
+              <p style={{ color: '#1e293b', fontSize: '14px', margin: 0, fontWeight: 500 }}>
+                {formatDate(pago.fechaPago)}
+              </p>
+            </div>
+          )}
+          {pago.idPedido && (
+            <div style={{
+              background: '#f8fafc',
+              borderRadius: '8px',
+              padding: '16px',
+              marginBottom: '24px'
+            }}>
+              <p style={{ color: '#94a3b8', fontSize: '12px', margin: 0, marginBottom: '4px' }}>
+                Número de pedido
+              </p>
+              <p style={{ color: '#1e293b', fontSize: '14px', margin: 0, fontWeight: 500 }}>
+                {pago.idPedido}
+              </p>
+            </div>
           )}
           <Link
             href="/"
             style={{
               display: 'inline-block',
-              padding: '12px 24px',
+              padding: '14px 28px',
               background: '#3b82f6',
               color: 'white',
               borderRadius: '8px',
               textDecoration: 'none',
-              fontWeight: 500
+              fontWeight: 600,
+              fontSize: '16px',
+              transition: 'background 0.2s'
             }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#2563eb'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#3b82f6'}
           >
             Volver al inicio
           </Link>
@@ -212,7 +288,7 @@ export default function PagarPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#f8fafc',
+        background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
         padding: '24px'
       }}>
@@ -222,29 +298,82 @@ export default function PagarPage() {
           padding: '48px',
           textAlign: 'center',
           maxWidth: '500px',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
         }}>
-          <XCircle size={64} style={{ color: '#ef4444', margin: '0 auto 24px' }} />
-          <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1e293b', marginBottom: '12px' }}>
+          <div style={{
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            background: '#fee2e2',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 24px'
+          }}>
+            <XCircle size={48} style={{ color: '#ef4444' }} />
+          </div>
+          <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#1e293b', marginBottom: '12px' }}>
             Pago Rechazado
           </h1>
-          <p style={{ color: '#64748b', marginBottom: '24px' }}>
-            El pago no pudo ser procesado. Por favor, intenta nuevamente o contacta con soporte.
+          <p style={{ color: '#64748b', marginBottom: '24px', fontSize: '16px' }}>
+            El pago de <strong style={{ color: '#1e293b' }}>{formatCurrency(pago.monto)}</strong> no pudo ser procesado.
           </p>
-          <Link
-            href="/"
-            style={{
-              display: 'inline-block',
-              padding: '12px 24px',
-              background: '#3b82f6',
-              color: 'white',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              fontWeight: 500
-            }}
-          >
-            Volver al inicio
-          </Link>
+          <div style={{
+            background: '#fef2f2',
+            border: '1px solid #fecaca',
+            borderRadius: '8px',
+            padding: '16px',
+            marginBottom: '24px',
+            textAlign: 'left'
+          }}>
+            <p style={{ color: '#991b1b', margin: 0, fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>
+              Posibles causas:
+            </p>
+            <ul style={{ color: '#991b1b', margin: 0, paddingLeft: '20px', fontSize: '13px' }}>
+              <li>Datos de la tarjeta incorrectos</li>
+              <li>Fondos insuficientes</li>
+              <li>Tarjeta bloqueada o vencida</li>
+              <li>Problemas con el banco emisor</li>
+            </ul>
+          </div>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+            <a
+              href={paymentUrl || '#'}
+              style={{
+                display: 'inline-block',
+                padding: '14px 28px',
+                background: '#3b82f6',
+                color: 'white',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '16px',
+                transition: 'background 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#2563eb'}
+              onMouseLeave={(e) => e.currentTarget.style.background = '#3b82f6'}
+            >
+              Intentar nuevamente
+            </a>
+            <Link
+              href="/"
+              style={{
+                display: 'inline-block',
+                padding: '14px 28px',
+                background: '#e5e7eb',
+                color: '#374151',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '16px',
+                transition: 'background 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#d1d5db'}
+              onMouseLeave={(e) => e.currentTarget.style.background = '#e5e7eb'}
+            >
+              Volver al inicio
+            </Link>
+          </div>
         </div>
       </div>
     )
@@ -313,7 +442,8 @@ export default function PagarPage() {
           )}
         </div>
 
-        {status === 'pending' && (
+        {/* Mensaje de estado pendiente */}
+        {(status === 'pending' || pago.estado === 'GENERADO') && collectionStatus !== 'approved' && (
           <div style={{
             background: '#fef3c7',
             border: '1px solid #fde68a',
@@ -325,9 +455,62 @@ export default function PagarPage() {
             gap: '12px'
           }}>
             <Clock size={20} style={{ color: '#92400e' }} />
-            <p style={{ color: '#92400e', margin: 0, fontSize: '14px' }}>
-              Tu pago está siendo procesado. Te notificaremos cuando se complete.
-            </p>
+            <div>
+              <p style={{ color: '#92400e', margin: 0, fontSize: '14px', fontWeight: 500 }}>
+                Pago pendiente
+              </p>
+              <p style={{ color: '#92400e', margin: '4px 0 0 0', fontSize: '12px' }}>
+                Tu pago está siendo procesado. Te notificaremos cuando se complete.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Mensaje de estado rechazado */}
+        {(status === 'failure' || collectionStatus === 'rejected' || pago.estado === 'RECHAZADO') && (
+          <div style={{
+            background: '#fee2e2',
+            border: '1px solid #fecaca',
+            borderRadius: '8px',
+            padding: '16px',
+            marginBottom: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <XCircle size={20} style={{ color: '#991b1b' }} />
+            <div>
+              <p style={{ color: '#991b1b', margin: 0, fontSize: '14px', fontWeight: 500 }}>
+                Pago rechazado
+              </p>
+              <p style={{ color: '#991b1b', margin: '4px 0 0 0', fontSize: '12px' }}>
+                El pago no pudo ser procesado. Por favor, intenta nuevamente o contacta con soporte.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Mensaje de estado aprobado */}
+        {(status === 'approved' || collectionStatus === 'approved') && pago.estado !== 'APROBADO' && (
+          <div style={{
+            background: '#d1fae5',
+            border: '1px solid #a7f3d0',
+            borderRadius: '8px',
+            padding: '16px',
+            marginBottom: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <CheckCircle2 size={20} style={{ color: '#065f46' }} />
+            <div>
+              <p style={{ color: '#065f46', margin: 0, fontSize: '14px', fontWeight: 500 }}>
+                Procesando confirmación...
+              </p>
+              <p style={{ color: '#065f46', margin: '4px 0 0 0', fontSize: '12px' }}>
+                Tu pago fue aprobado. Estamos confirmando el pago.
+              </p>
+            </div>
           </div>
         )}
 
@@ -365,6 +548,28 @@ export default function PagarPage() {
             Generando enlace de pago...
           </div>
         )}
+
+        {/* Nota sobre modo Sandbox - Solo en desarrollo */}
+        {typeof window !== 'undefined' && 
+         (window.location.hostname === 'localhost' || window.location.hostname.includes('vercel.app')) ? (
+          <div style={{
+            background: '#fef3c7',
+            border: '1px solid #fde68a',
+            borderRadius: '8px',
+            padding: '16px',
+            marginTop: '16px',
+            marginBottom: '16px'
+          }}>
+            <p style={{ color: '#92400e', margin: 0, fontSize: '13px', fontWeight: 500, marginBottom: '8px' }}>
+              ⚠️ Modo de Prueba (Sandbox)
+            </p>
+            <p style={{ color: '#92400e', margin: 0, fontSize: '12px', lineHeight: '1.5' }}>
+              <strong>Usa tarjetas de prueba:</strong> Visa: <strong>4509 9535 6623 3704</strong> | 
+              Mastercard: <strong>5031 7557 3453 0604</strong><br/>
+              CVV: cualquier 3 dígitos | Fecha: cualquier fecha futura | DNI: cualquier 8 dígitos
+            </p>
+          </div>
+        ) : null}
 
         <p style={{
           color: '#94a3b8',
