@@ -442,8 +442,8 @@ export default function PagarPage() {
           )}
         </div>
 
-        {/* Mensaje de estado pendiente */}
-        {(status === 'pending' || pago.estado === 'GENERADO') && collectionStatus !== 'approved' && (
+        {/* Mensaje de estado pendiente - Solo si tiene init_point o ID de Mercado Pago */}
+        {(status === 'pending' || (pago.estado === 'GENERADO' && (pago.mercadoPagoId || pago.mercadoPagoInitPoint))) && collectionStatus !== 'approved' && (
           <div style={{
             background: '#fef3c7',
             border: '1px solid #fde68a',
@@ -514,7 +514,25 @@ export default function PagarPage() {
           </div>
         )}
 
-        {paymentUrl ? (
+        {/* Si es método gateway y no tiene init_point, mostrar mensaje informativo */}
+        {!paymentUrl && !pago.mercadoPagoId && !pago.mercadoPagoInitPoint && pago.estado === 'GENERADO' ? (
+          <div style={{
+            padding: '20px',
+            background: '#fef3c7',
+            border: '1px solid #fde68a',
+            borderRadius: '8px',
+            textAlign: 'center',
+            color: '#92400e',
+            marginBottom: '16px'
+          }}>
+            <p style={{ margin: 0, fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>
+              Pago Gateway
+            </p>
+            <p style={{ margin: 0, fontSize: '13px' }}>
+              Este pago se procesará directamente con tarjeta. Por favor, contacta con el administrador para completar el pago.
+            </p>
+          </div>
+        ) : paymentUrl ? (
           <a
             href={paymentUrl}
             style={{

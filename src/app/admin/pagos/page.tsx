@@ -530,8 +530,13 @@ export default function PagosPage() {
                 zIndex: 1
               }}
             >
-              <div style={{ padding: '24px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+              {/* Header fijo */}
+              <div style={{
+                padding: '24px',
+                borderBottom: '1px solid #e2e8f0',
+                flexShrink: 0
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#1e293b', margin: 0 }}>
                     {isCreating ? 'Creando Pago' : 'Editar Pago'}
                   </h2>
@@ -542,13 +547,25 @@ export default function PagosPage() {
                       background: 'transparent',
                       border: 'none',
                       cursor: 'pointer',
-                      color: '#94a3b8'
+                      color: '#94a3b8',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
                     }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#64748b'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
                   >
                     <X size={20} />
                   </button>
                 </div>
+              </div>
 
+              {/* Contenido scrolleable */}
+              <div style={{
+                flex: 1,
+                overflowY: 'auto',
+                padding: '24px'
+              }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px' }}>
@@ -711,63 +728,85 @@ export default function PagosPage() {
                       </select>
                     </div>
                   )}
+                </div>
+              </div>
 
-                  <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-                    <button
-                      onClick={() => setModalOpen(false)}
-                      style={{
-                        flex: 1,
-                        padding: '10px 20px',
-                        background: '#f1f5f9',
-                        color: '#374151',
-                        border: 'none',
-                        borderRadius: '8px',
-                        fontSize: '14px',
-                        fontWeight: 500,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      onClick={handleSave}
-                      disabled={saving}
-                      style={{
-                        flex: 1,
-                        padding: '10px 20px',
-                        background: saving ? '#94a3b8' : '#10b981',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        fontSize: '14px',
-                        fontWeight: 500,
-                        cursor: saving ? 'not-allowed' : 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px'
-                      }}
-                    >
-                      {saving ? (
-                        <>
-                          <div style={{
-                            width: '16px',
-                            height: '16px',
-                            border: '2px solid white',
-                            borderTopColor: 'transparent',
-                            borderRadius: '50%',
-                            animation: 'spin 1s linear infinite'
-                          }}></div>
-                          Guardando...
-                        </>
-                      ) : (
-                        <>
-                          <Save size={16} />
-                          Guardar
-                        </>
-                      )}
-                    </button>
-                  </div>
+              {/* Footer fijo con botones */}
+              <div style={{
+                padding: '24px',
+                borderTop: '1px solid #e2e8f0',
+                flexShrink: 0,
+                background: 'white'
+              }}>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button
+                    onClick={() => setModalOpen(false)}
+                    style={{
+                      flex: 1,
+                      padding: '12px 20px',
+                      background: '#f1f5f9',
+                      color: '#374151',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = '#e2e8f0'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = '#f1f5f9'}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    style={{
+                      flex: 1,
+                      padding: '12px 20px',
+                      background: saving ? '#94a3b8' : '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      cursor: saving ? 'not-allowed' : 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      transition: 'background 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!saving) {
+                        e.currentTarget.style.background = '#059669'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!saving) {
+                        e.currentTarget.style.background = '#10b981'
+                      }
+                    }}
+                  >
+                    {saving ? (
+                      <>
+                        <div style={{
+                          width: '16px',
+                          height: '16px',
+                          border: '2px solid white',
+                          borderTopColor: 'transparent',
+                          borderRadius: '50%',
+                          animation: 'spin 1s linear infinite'
+                        }}></div>
+                        Guardando...
+                      </>
+                    ) : (
+                      <>
+                        <Save size={16} />
+                        Guardar
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             </motion.div>
