@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   title: "MeleRoller - Cortinas y Cerramientos | Buenos Aires, Argentina",
   description: "Especialistas en cortinas roller, blackout, sunscreen, romanas, orientales y tradicionales. Toldos y cerramientos. 3 años de garantía. Visitas sin cargo en Buenos Aires.",
   keywords: "cortinas, roller, blackout, sunscreen, cortinas romanas, paneles orientales, toldos, cerramientos, buenos aires, argentina",
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.png',
+  },
   openGraph: {
     title: "MeleRoller - Cortinas y Cerramientos",
     description: "Especialistas en cortinas roller y cerramientos. Visitas sin cargo.",
@@ -23,8 +28,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className="antialiased">
-        <main>{children}</main>
+      <body className="antialiased" style={{ margin: 0, padding: 0 }}>
+        <main style={{ margin: 0, padding: 0 }}>{children}</main>
         <Footer />
       </body>
     </html>

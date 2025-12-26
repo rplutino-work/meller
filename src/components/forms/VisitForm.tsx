@@ -19,7 +19,7 @@ const visitSchema = z.object({
 type VisitFormData = z.infer<typeof visitSchema>
 
 interface VisitFormProps {
-  variant?: 'full' | 'simple'
+  variant?: 'full' | 'simple' | 'contact'
 }
 
 export default function VisitForm({ variant = 'full' }: VisitFormProps) {
@@ -87,6 +87,143 @@ export default function VisitForm({ variant = 'full' }: VisitFormProps) {
           {successMessage}
         </p>
       </motion.div>
+    )
+  }
+
+  // Contact variant - exact match to original site
+  if (variant === 'contact') {
+    return (
+      <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'block' }}>
+        <div style={{ marginBottom: '15px' }}>
+          <input
+            type="text"
+            {...register('nombre')}
+            style={{
+              width: '457.5px',
+              padding: '10px 16px',
+              border: '0.67px solid #aaa',
+              fontSize: '20px',
+              fontFamily: 'Oswald, sans-serif',
+              backgroundColor: '#fff',
+              color: '#000',
+              outline: 'none',
+              boxSizing: 'border-box'
+            }}
+            placeholder="Nombre"
+            required
+          />
+          {errors.nombre && (
+            <p style={{ color: '#f00', fontSize: '12px', marginTop: '5px' }}>{errors.nombre.message}</p>
+          )}
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <input
+            type="tel"
+            {...register('telefono')}
+            style={{
+              width: '457.5px',
+              padding: '10px 16px',
+              border: '0.67px solid #aaa',
+              fontSize: '20px',
+              fontFamily: 'Oswald, sans-serif',
+              backgroundColor: '#fff',
+              color: '#000',
+              outline: 'none',
+              boxSizing: 'border-box'
+            }}
+            placeholder="Teléfono"
+          />
+          {errors.telefono && (
+            <p style={{ color: '#f00', fontSize: '12px', marginTop: '5px' }}>{errors.telefono.message}</p>
+          )}
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <input
+            type="email"
+            {...register('email')}
+            style={{
+              width: '457.5px',
+              padding: '10px 16px',
+              border: '0.67px solid #aaa',
+              fontSize: '20px',
+              fontFamily: 'Oswald, sans-serif',
+              backgroundColor: '#fff',
+              color: '#000',
+              outline: 'none',
+              boxSizing: 'border-box'
+            }}
+            placeholder="Email"
+            required
+          />
+          {errors.email && (
+            <p style={{ color: '#f00', fontSize: '12px', marginTop: '5px' }}>{errors.email.message}</p>
+          )}
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <textarea
+            {...register('mensaje')}
+            rows={4}
+            style={{
+              width: '457.5px',
+              padding: '10px 16px',
+              border: '0.67px solid #aaa',
+              fontSize: '20px',
+              fontFamily: 'Oswald, sans-serif',
+              backgroundColor: '#fff',
+              color: '#000',
+              outline: 'none',
+              resize: 'none',
+              boxSizing: 'border-box'
+            }}
+            placeholder="Mensaje"
+            required
+          />
+        </div>
+
+        {error && (
+          <div style={{ backgroundColor: '#fee', color: '#c00', padding: '10px', marginBottom: '15px', fontSize: '13px' }}>
+            {error}
+          </div>
+        )}
+
+        <br />
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          style={{
+            width: '457.5px',
+            padding: '30px 16px',
+            border: '4.67px solid #000',
+            fontSize: '20px',
+            fontFamily: 'Oswald, sans-serif',
+            backgroundColor: '#fff',
+            color: '#000',
+            cursor: isSubmitting ? 'not-allowed' : 'pointer',
+            textTransform: 'uppercase',
+            fontWeight: 400,
+            display: 'block',
+            boxSizing: 'border-box',
+            transition: 'all 0.3s'
+          }}
+          onMouseEnter={(e) => {
+            if (!isSubmitting) {
+              e.currentTarget.style.backgroundColor = '#000';
+              e.currentTarget.style.color = '#fff';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isSubmitting) {
+              e.currentTarget.style.backgroundColor = '#fff';
+              e.currentTarget.style.color = '#000';
+            }
+          }}
+        >
+          {isSubmitting ? 'Enviando...' : 'Enviar'}
+        </button>
+      </form>
     )
   }
 

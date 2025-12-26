@@ -58,13 +58,20 @@ NEXT_PUBLIC_BASE_URL=https://tu-dominio.vercel.app
    ```
    - **Nota:** El script `postinstall` en `package.json` ejecutará `prisma generate` automáticamente después de `npm install`
 
-5. **Configura el Webhook de Mercado Pago**
-   - Una vez desplegado, copia la URL de tu API:
+5. **Configura el Dominio Personalizado (www.meleroller.com.ar)**
+   - Ve a Settings > Domains en Vercel
+   - Agrega `www.meleroller.com.ar`
+   - Sigue las instrucciones de Vercel para configurar los registros DNS
+   - Vercel generará automáticamente el SSL
+   - Ver guía completa en `DOMAIN_MIGRATION.md`
+
+6. **Configura el Webhook de Mercado Pago**
+   - Una vez configurado el dominio, actualiza el webhook con:
    ```
-   https://tu-dominio.vercel.app/api/pagos/mercado-pago/webhook
+   https://www.meleroller.com.ar/api/pagos/mercado-pago/webhook
    ```
    - Ve a tu panel de Mercado Pago > Webhooks
-   - Configura el webhook con esta URL
+   - Actualiza la URL del webhook con el nuevo dominio
 
 ## Notas Importantes
 

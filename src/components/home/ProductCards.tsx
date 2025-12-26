@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -7,102 +8,218 @@ import Image from 'next/image'
 const products = [
   {
     id: 1,
-    prefix: 'ROLLER',
-    name: 'BLACKOUT',
-    image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&q=80',
+    name: 'Roller Black Out',
+    headingHTML: 'Roller <br><span>Black Out</span>',
+    image: '/images/products/cortinas-roller-blackout-mele-roller-03.jpg',
     href: '/blackout',
+    className: 'effect-chico',
+    fontSize: '52px',
   },
   {
     id: 2,
-    prefix: 'ROLLER',
-    name: 'SUNSCREEN',
-    image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80',
+    name: 'Roller Sunscreen',
+    headingHTML: 'Roller <br><span>Sunscreen</span>',
+    image: '/images/products/cortina-roller-sunscreen-05.jpg',
     href: '/sunscreen',
+    className: 'effect-chico',
+    fontSize: '52px',
   },
   {
     id: 3,
-    prefix: '',
-    name: 'ECLIPSE',
-    image: 'https://images.unsplash.com/photo-1615874959474-d609969a20ed?w=800&q=80',
+    name: 'Eclipse',
+    headingHTML: 'Eclipse',
+    image: '/images/products/cortina-eclipse-mele-roller-01.jpg',
     href: '/eclipse',
+    className: 'effect-chico special-2',
+    fontSize: '34px',
   },
   {
     id: 4,
-    prefix: 'PANELES',
-    name: 'ORIENTALES',
-    image: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&q=80',
+    name: 'Paneles Orientales',
+    headingHTML: 'Paneles Orientales',
+    image: '/images/products/paneles-orientales-mele-roller-04.jpg',
     href: '/orientales',
+    className: 'effect-chico special-1',
+    fontSize: '34px',
   },
   {
     id: 5,
-    prefix: '',
-    name: 'ROMANAS',
-    image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80',
+    name: 'Romanas',
+    headingHTML: 'Romanas',
+    image: '/images/products/cortinas-romanas-mele-roller-06.jpg',
     href: '/romanas',
+    className: 'effect-chico special-2',
+    fontSize: '34px',
   },
   {
     id: 6,
-    prefix: '',
-    name: 'TRADICIONALES',
-    image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80',
+    name: 'Tradicionales',
+    headingHTML: 'Tradicionales',
+    image: '/images/products/cortina-tradicional-mele-roller-07.jpg',
     href: '/tradicionales',
+    className: 'effect-chico special-2',
+    fontSize: '34px',
   },
 ]
 
 export default function ProductCards() {
-  return (
-    <section className="bg-white">
-      {/* Title - with black borders top and bottom */}
-      <div className="border-t border-b border-black py-10 lg:py-14 px-6 lg:px-10">
-        <motion.h3
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-[48px] md:text-[64px] lg:text-[80px] xl:text-[90px] font-light italic uppercase tracking-[-0.02em] text-black text-center leading-[0.95]"
-          style={{ fontFamily: 'Oswald, sans-serif' }}
-        >
-          SOMOS ESPECIALISTAS EN CORTINAS
-        </motion.h3>
-      </div>
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  const [isAnimated, setIsAnimated] = useState(false)
 
-      {/* Products Grid - 2 rows of 3 */}
-      <div className="grid grid-cols-1 md:grid-cols-3">
-        {products.map((product, index) => (
-          <motion.div
-            key={product.id}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <Link href={product.href} className="relative block aspect-[4/3] overflow-hidden group">
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !isAnimated) {
+            setIsAnimated(true)
+            if (titleRef.current) {
+              titleRef.current.classList.add('animar')
+            }
+          }
+        })
+      },
+      { threshold: 0.1 }
+    )
+
+    if (titleRef.current) {
+      observer.observe(titleRef.current)
+    }
+
+    return () => {
+      if (titleRef.current) {
+        observer.unobserve(titleRef.current)
+      }
+    }
+  }, [isAnimated])
+
+  // Dividir el texto en letras
+  const text = 'SOMOS ESPECIALISTAS EN CORTINAS'
+  const letters = text.split('')
+
+  return (
+    <>
+      {/* Title Section - with animated letters */}
+      <section style={{ margin: '5em 0' }}>
+        <div className="container-fluid" style={{ width: '100%', padding: '0 15px', margin: '0 auto', maxWidth: '100%' }}>
+          <div className="row" style={{ display: 'block', margin: '0 -15px', padding: 0, width: '100%', boxSizing: 'border-box' }}>
+            <div className="col-md-12 text-center" style={{ width: '100%', padding: '0 15px', margin: 0, boxSizing: 'border-box' }}>
+              <h3
+                id="titulo-animado"
+                ref={titleRef}
+                style={{
+                  fontSize: '7vw',
+                  margin: 0,
+                  padding: 0,
+                  fontFamily: 'Oswald, sans-serif',
+                  fontWeight: 300,
+                  color: '#000',
+                  textAlign: 'center',
+                  display: 'inline-block',
+                  overflow: 'hidden'
+                }}
+              >
+                {letters.map((letter, index) => (
+                  <span
+                    key={index}
+                    className="letra"
+                    style={{ '--i': index } as React.CSSProperties}
+                  >
+                    {letter === ' ' ? '\u00A0' : letter}
+                  </span>
+                ))}
+              </h3>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Products Section */}
+      <section id="cortinas" style={{ padding: 0, margin: 0, backgroundColor: 'transparent' }}>
+        <div className="grid" style={{ padding: 0, display: 'block', textAlign: 'center', fontSize: 0 }}>
+          {products.map((product, index) => (
+            <figure
+              key={product.id}
+              className={product.className}
+              style={{
+                display: 'inline-block',
+                position: 'relative',
+                width: '479.992px',
+                height: '400px',
+                margin: '-2.16px',
+                padding: 0,
+                backgroundColor: '#000',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                verticalAlign: 'top'
+              }}
+            >
               <Image
                 src={product.image}
                 alt={product.name}
                 fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                sizes="479.992px"
+                style={{
+                  objectFit: 'cover'
+                }}
+                priority={index < 3}
+                unoptimized
+                className="product-image"
               />
-              {/* Subtle gradient overlay at bottom */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-              {/* Text - aligned to bottom left */}
-              <div className="absolute bottom-6 left-6 text-white text-left">
-                {product.prefix && (
-                  <span className="block text-[16px] md:text-[18px] lg:text-[20px] font-light tracking-[0.15em]">
-                    {product.prefix}
-                  </span>
-                )}
-                <h3 
-                  className="text-[24px] md:text-[28px] lg:text-[32px] font-bold tracking-[0.05em]" 
-                  style={{ fontFamily: 'Oswald, sans-serif' }}
+              <figcaption
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  padding: '3em',
+                  backgroundColor: 'rgba(0, 0, 0, 0)',
+                  opacity: 1,
+                  transition: 'all 0.35s ease'
+                }}
+                className="product-figcaption"
+              >
+                <h2
+                  className="xxlarge"
+                  style={{
+                    fontSize: product.fontSize,
+                    fontWeight: 300,
+                    color: '#fff',
+                    fontFamily: 'Oswald, sans-serif',
+                    textTransform: 'uppercase',
+                    margin: 0,
+                    padding: 0,
+                    textAlign: 'center',
+                    position: 'absolute',
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    lineHeight: product.fontSize === '52px' ? '57.2px' : '37.4px',
+                    letterSpacing: 'normal',
+                    fontStyle: 'normal'
+                  }}
+                  dangerouslySetInnerHTML={{ __html: product.headingHTML }}
+                />
+                <Link
+                  href={product.href}
+                  style={{
+                    fontSize: '0px',
+                    fontWeight: 400,
+                    color: '#000',
+                    textDecoration: 'none',
+                    margin: 0,
+                    padding: 0,
+                    position: 'absolute',
+                    zIndex: 1000
+                  }}
                 >
-                  {product.name}
-                </h3>
-              </div>
-            </Link>
-          </motion.div>
-        ))}
-      </div>
-    </section>
+                  Ver más
+                </Link>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+    </>
   )
 }

@@ -1,90 +1,271 @@
 'use client'
 
 import Link from 'next/link'
-import { Instagram, Facebook } from 'lucide-react'
 
 const cortinas = [
-  { name: 'BlackOut', href: '/blackout' },
-  { name: 'SunScreen', href: '/sunscreen' },
-  { name: 'Romanas', href: '/romanas' },
-  { name: 'Orientales', href: '/orientales' },
-  { name: 'Tradicionales', href: '/tradicionales' },
-  { name: 'Eclipse', href: '/eclipse' },
-  { name: 'Bandas Verticales', href: '/bandas-verticales' },
+  { name: 'BlackOut', href: '/cortinas/BlackOut' },
+  { name: 'SunScreen', href: '/cortinas/SunScreen' },
+  { name: 'Romanas', href: '/cortinas/Romanas' },
+  { name: 'Orientales', href: '/cortinas/Orientales' },
+  { name: 'Tradicionales', href: '/cortinas/Tradicionales' },
+  { name: 'Eclipse', href: '/cortinas/Eclipse' },
+  { name: 'Bandas Verticales', href: '/cortinas/Bandas-Verticales' },
 ]
 
 const sillones = [
-  { name: 'Tradicionales', href: '/sillones#tradicionales' },
-  { name: 'Puff Movibles', href: '/sillones#puff' },
-  { name: 'Restauración', href: '/sillones#restauracion' },
+  { name: 'Tradicionales', href: '/sillones/Tradicionales' },
+  { name: 'Puff Movibles', href: '/sillones/Puff-Movibles' },
+  { name: 'Restauración', href: '/sillones/Restauracion' },
 ]
 
 export default function Footer() {
   return (
-    <footer className="bg-black text-white py-16">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-16">
-          {/* Redes sociales y atención */}
-          <div>
-            <h3 className="text-[13px] uppercase tracking-[0.15em] text-white mb-6">
-              Seguinos en
+    <footer 
+      className="footer footer-sm"
+      style={{
+        backgroundColor: '#000',
+        color: '#fff',
+        padding: '19.2px 0 16px',
+        margin: 0,
+        fontSize: '16px',
+        fontFamily: 'Oswald, sans-serif'
+      }}
+    >
+      <div 
+        className="container"
+        style={{
+          width: '100%',
+          maxWidth: '1170px',
+          padding: '0 15px',
+          margin: '0 auto',
+          boxSizing: 'border-box'
+        }}
+      >
+        {/* First Row */}
+        <div 
+          className="row"
+          style={{
+            display: 'block',
+            margin: '0 -15px',
+            padding: 0,
+            width: '100%',
+            boxSizing: 'border-box'
+          }}
+        >
+          {/* Left Column - Social & Customer Service */}
+          <div 
+            className="col-md-6"
+            style={{
+              width: '50%',
+              padding: '0 15px',
+              margin: 0,
+              boxSizing: 'border-box',
+              display: 'block',
+              float: 'left'
+            }}
+          >
+            <h3 
+              className="norm gray-light"
+              style={{
+                fontSize: '16px',
+                fontWeight: 300,
+                color: 'rgb(170, 170, 170)',
+                margin: '22px 0 11px',
+                textTransform: 'none',
+                fontFamily: 'Oswald, sans-serif'
+              }}
+            >
+              SEGUINOS EN
             </h3>
-            <div className="flex gap-3 mb-10">
-              <a 
-                href="https://facebook.com/meleroller" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-[48px] h-[48px] rounded-full border border-gray-600 flex items-center justify-center text-white hover:border-white transition-colors"
-              >
-                <Facebook size={20} />
-              </a>
-              <a 
-                href="https://instagram.com/meleroller" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-[48px] h-[48px] rounded-full border border-gray-600 flex items-center justify-center text-white hover:border-white transition-colors"
-              >
-                <Instagram size={20} />
-              </a>
-              <a 
-                href="https://threads.net/meleroller" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-[48px] h-[48px] rounded-full border border-gray-600 flex items-center justify-center text-white hover:border-white transition-colors"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.96-.065-1.182.408-2.256 1.332-3.023.867-.72 2.062-1.148 3.56-1.27 1.187-.097 2.278.017 3.255.273-.089-.844-.353-1.493-.789-1.933-.546-.552-1.386-.834-2.5-.839l-.135-.002c-.93 0-1.96.253-2.553.687l-1.14-1.694c.904-.614 2.24-.99 3.7-.99l.202.003c1.765.019 3.153.538 4.127 1.542.918.947 1.418 2.27 1.489 3.936.31.168.605.36.882.573 1.168.903 1.965 2.18 2.307 3.694.45 1.996.137 4.389-1.64 6.233-1.838 1.906-4.17 2.733-7.34 2.758zm-1.886-6.086l.148.002c.947-.01 1.688-.286 2.202-.82.476-.495.784-1.218.917-2.149-1.37-.303-2.916-.322-4.023.039-.782.255-1.927.793-1.856 2.087.036.646.399 1.18 1.023 1.503.515.267 1.09.368 1.59.338z"/>
-                </svg>
-              </a>
-            </div>
+            <ul 
+              className="list-inline"
+              style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: '0 0 8px',
+                display: 'flex',
+                gap: '10px',
+                flexWrap: 'wrap'
+              }}
+            >
+              <li style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                <a 
+                  href="https://www.facebook.com/cortinasmeleroller" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: 'inline-block', textDecoration: 'none' }}
+                >
+                  <div 
+                    className="facebook"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      border: '0.67px solid rgb(128, 128, 128)',
+                      borderRadius: '100%',
+                      backgroundColor: 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 7.9 17.01" enableBackground="new 0 0 7.9 17.01" xmlSpace="preserve" style={{ width: '12px', height: '24px', fill: 'rgb(128, 128, 128)' }}>
+                      <path d="M7.9,5.51H5.21V3.74c0-0.66,0.44-0.82,0.75-0.82c0.31,0,1.9,0,1.9,0V0.01L5.24,0c-2.9,0-3.56,2.17-3.56,3.57v1.94H0v3h1.68c0,3.85,0,8.5,0,8.5h3.53c0,0,0-4.69,0-8.5h2.38L7.9,5.51L7.9,5.51z"/>
+                    </svg>
+                  </div>
+                </a>
+              </li>
+              <li style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                <a 
+                  href="https://www.instagram.com/_meleroller" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: 'inline-block', textDecoration: 'none' }}
+                >
+                  <div 
+                    className="instagram"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      border: '0.67px solid rgb(128, 128, 128)',
+                      borderRadius: '100%',
+                      backgroundColor: 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16.88px" height="17.01px" viewBox="0 0 16.88 17.01" enableBackground="new 0 0 16.88 17.01" xmlSpace="preserve" style={{ width: '20px', height: '20px', fill: 'rgb(128, 128, 128)' }}>
+                      <path d="M13.26,0H3.62C1.63,0,0,1.59,0,3.54v9.93c0,1.95,1.63,3.54,3.62,3.54h9.64c2,0,3.62-1.59,3.62-3.54V3.54C16.88,1.59,15.26,0,13.26,0z M15.43,13.47c0,1.15-0.97,2.08-2.16,2.08H3.62c-1.19,0-2.16-0.93-2.16-2.08V3.54c0-1.15,0.97-2.08,2.16-2.08h9.64c1.19,0,2.16,0.93,2.16,2.08V13.47z M8.44,4.09c-2.43,0-4.41,1.98-4.41,4.41c0,2.43,1.98,4.41,4.41,4.41c2.43,0,4.41-1.98,4.41-4.41C12.86,6.07,10.88,4.09,8.44,4.09z M8.44,11.46c-1.63,0-2.96-1.33-2.96-2.96c0-1.63,1.33-2.96,2.96-2.96c1.63,0,2.96,1.33,2.96,2.96C11.4,10.13,10.07,11.46,8.44,11.46z M13.18,2.83c-0.57,0-1.03,0.46-1.03,1.03c0,0.57,0.46,1.03,1.03,1.03c0.57,0,1.03-0.46,1.03-1.03C14.21,3.3,13.75,2.83,13.18,2.83z"/>
+                    </svg>
+                  </div>
+                </a>
+              </li>
+              <li style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                <a 
+                  href="https://www.threads.com/@_meleroller?xmt=AQF0Isbp31t_Re2x8cjOx_MUzbV7m1URQH22sD_FudX7tjI" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: 'inline-block', textDecoration: 'none' }}
+                >
+                  <div 
+                    className="instagram"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      border: '0.67px solid rgb(128, 128, 128)',
+                      borderRadius: '100%',
+                      backgroundColor: 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style={{ width: '20px', height: '20px', fill: 'rgb(128, 128, 128)' }}>
+                      <path d="M6.321 6.016c-.27-.18-1.166-.802-1.166-.802.756-1.081 1.753-1.502 3.132-1.502.975 0 1.803.327 2.394.948s.928 1.509 1.005 2.644q.492.207.905.484c1.109.745 1.719 1.86 1.719 3.137 0 2.716-2.226 5.075-6.256 5.075C4.594 16 1 13.987 1 7.994 1 2.034 4.482 0 8.044 0 9.69 0 13.55.243 15 5.036l-1.36.353C12.516 1.974 10.163 1.43 8.006 1.43c-3.565 0-5.582 2.171-5.582 6.79 0 4.143 2.254 6.343 5.63 6.343 2.777 0 4.847-1.443 4.847-3.556 0-1.438-1.208-2.127-1.27-2.127-.236 1.234-.868 3.31-3.644 3.31-1.618 0-3.013-1.118-3.013-2.582 0-2.09 1.984-2.847 3.55-2.847.586 0 1.294.04 1.663.114 0-.637-.54-1.728-1.9-1.728-1.25 0-1.566.405-1.967.868ZM8.716 8.19c-2.04 0-2.304.87-2.304 1.416 0 .878 1.043 1.168 1.6 1.168 1.02 0 2.067-.282 2.232-2.423a6.2 6.2 0 0 0-1.528-.161"/>
+                    </svg>
+                  </div>
+                </a>
+              </li>
+            </ul>
             
-            <h3 className="text-[13px] italic text-white mb-4">
+            {/* Divider Line */}
+            <div 
+              className="line"
+              style={{
+                background: '#555555',
+                height: '0.025em',
+                width: '100%',
+                margin: '11px 0'
+              }}
+            />
+            
+            <h3 
+              className="norm gray-light semibold"
+              style={{
+                fontSize: '16px',
+                fontWeight: 400,
+                color: 'rgb(170, 170, 170)',
+                margin: '22px 0 11px',
+                textTransform: 'none',
+                fontFamily: 'Oswald, sans-serif'
+              }}
+            >
               Atención al cliente:
             </h3>
-            <div className="text-[14px] text-gray-400 space-y-2">
-              <p>
-                Presidente Juan Domingo Perón 1154 • Burzaco • Buenos Aires • Argentina
-              </p>
-              <p>
-                Lunes a Viernes de 8.00 a 12.00 hs. y de 13.30 a 17.00 hs.
-              </p>
-              <p className="text-gray-500">
-                Visitas al Showroom con cita previa.
-              </p>
-            </div>
+            <p 
+              className="gray-light light"
+              style={{
+                fontSize: '16px',
+                fontWeight: 300,
+                color: 'rgb(170, 170, 170)',
+                margin: '0 0 11px',
+                lineHeight: '1.6',
+                fontFamily: 'Oswald, sans-serif'
+              }}
+            >
+              Presidente Juan Domingo Perón 1154 • Burzaco • Buenos Aires • Argentina<br />
+              Lunes a Viernes de 8.00 a 12.00 hs. y de 13.30 a 17.00 hs.<br />
+              Visitas al Showroom con cita previa.
+            </p>
           </div>
-
-          {/* Cortinas */}
-          <div>
-            <h3 className="text-[15px] text-white mb-6 font-light italic">
-              Cortinas
+          
+          {/* Middle Column - Cortinas */}
+          <div 
+            className="col-md-3"
+            style={{
+              width: '25%',
+              padding: '0 15px',
+              margin: 0,
+              boxSizing: 'border-box',
+              display: 'block',
+              float: 'left'
+            }}
+          >
+            <h3 
+              className="norm"
+              style={{
+                fontSize: '16px',
+                fontWeight: 300,
+                color: 'rgb(128, 128, 128)',
+                margin: '22px 0 11px',
+                textTransform: 'none',
+                fontFamily: 'Oswald, sans-serif'
+              }}
+            >
+              <Link 
+                href="/cortinas"
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 400,
+                  color: 'rgb(128, 128, 128)',
+                  textDecoration: 'none',
+                  fontFamily: 'Oswald, sans-serif'
+                }}
+              >
+                Cortinas
+              </Link>
             </h3>
-            <ul className="space-y-2">
+            <ul 
+              className="list-unstyled"
+              style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: '0 0 11px'
+              }}
+            >
               {cortinas.map((item) => (
-                <li key={item.name}>
+                <li key={item.name} style={{ listStyle: 'none', padding: 0, margin: '0 0 5px' }}>
                   <Link 
                     href={item.href}
-                    className="text-[14px] text-gray-400 hover:text-white transition-colors"
+                    style={{
+                      fontSize: '16px',
+                      color: 'rgb(128, 128, 128)',
+                      textDecoration: 'none',
+                      fontFamily: 'Oswald, sans-serif',
+                      transition: 'color 0.3s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'rgb(128, 128, 128)'}
                   >
                     {item.name}
                   </Link>
@@ -92,59 +273,201 @@ export default function Footer() {
               ))}
             </ul>
           </div>
-
-          {/* Sillones */}
-          <div>
-            <h3 className="text-[15px] text-white mb-6 font-light italic">
-              Sillones
+          
+          {/* Right Column - Sillones */}
+          <div 
+            className="col-md-3"
+            style={{
+              width: '25%',
+              padding: '0 15px',
+              margin: 0,
+              boxSizing: 'border-box',
+              display: 'block',
+              float: 'left'
+            }}
+          >
+            <h3 
+              className="norm"
+              style={{
+                fontSize: '16px',
+                fontWeight: 300,
+                color: 'rgb(128, 128, 128)',
+                margin: '22px 0 11px',
+                textTransform: 'none',
+                fontFamily: 'Oswald, sans-serif'
+              }}
+            >
+              <Link 
+                href="/sillones"
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 400,
+                  color: 'rgb(128, 128, 128)',
+                  textDecoration: 'none',
+                  fontFamily: 'Oswald, sans-serif'
+                }}
+              >
+                Sillones
+              </Link>
             </h3>
-            <ul className="space-y-2">
-              {sillones.map((item) => (
-                <li key={item.name}>
+            <ul 
+              className="list-unstyled"
+              style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: '0 0 11px'
+              }}
+            >
+              {sillones.map((item, index) => (
+                <li 
+                  key={item.name} 
+                  style={{ 
+                    listStyle: 'none', 
+                    padding: 0, 
+                    margin: index === 2 ? '0 0 12px' : '0 0 5px' 
+                  }}
+                >
                   <Link 
                     href={item.href}
-                    className="text-[14px] text-gray-400 hover:text-white transition-colors"
+                    style={{
+                      fontSize: '16px',
+                      color: 'rgb(128, 128, 128)',
+                      textDecoration: 'none',
+                      fontFamily: 'Oswald, sans-serif',
+                      transition: 'color 0.3s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'rgb(128, 128, 128)'}
                   >
                     {item.name}
                   </Link>
                 </li>
               ))}
-            </ul>
-            
-            <h3 className="text-[15px] text-white mb-6 mt-8 font-light italic">
-              Toldos y cerramientos
-            </h3>
-            
-            <ul className="space-y-2">
-              <li>
+              
+              <li 
+                className="norm"
+                style={{ 
+                  listStyle: 'none', 
+                  padding: 0, 
+                  margin: '0 0 12px' 
+                }}
+              >
+                <Link 
+                  href="/toldos-y-cerramientos"
+                  style={{
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: 'rgb(170, 170, 170)',
+                    textDecoration: 'none',
+                    fontFamily: 'Oswald, sans-serif',
+                    transition: 'color 0.3s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'rgb(170, 170, 170)'}
+                >
+                  Toldos y cerramientos
+                </Link>
+              </li>
+              
+              <li 
+                className="norm"
+                style={{ 
+                  listStyle: 'none', 
+                  padding: 0, 
+                  margin: '0 0 5px' 
+                }}
+              >
                 <Link 
                   href="/#solicitar-visita"
-                  className="text-[14px] text-gray-400 hover:text-white transition-colors"
+                  style={{
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: 'rgb(170, 170, 170)',
+                    textDecoration: 'none',
+                    fontFamily: 'Oswald, sans-serif',
+                    transition: 'color 0.3s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'rgb(170, 170, 170)'}
                 >
                   Solicitar visita sin cargo
                 </Link>
               </li>
-              <li>
+              
+              <li 
+                className="norm"
+                style={{ 
+                  listStyle: 'none', 
+                  padding: 0, 
+                  margin: 0 
+                }}
+              >
                 <Link 
                   href="/#cotizador"
-                  className="text-[14px] text-gray-400 hover:text-white transition-colors"
+                  style={{
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: 'rgb(170, 170, 170)',
+                    textDecoration: 'none',
+                    fontFamily: 'Oswald, sans-serif',
+                    transition: 'color 0.3s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'rgb(170, 170, 170)'}
                 >
                   Solicitar presupuesto
                 </Link>
               </li>
             </ul>
           </div>
-
-          {/* Empty column for spacing like original */}
-          <div className="hidden lg:block"></div>
         </div>
-
-        {/* Bottom */}
-        <div className="border-t border-gray-800 pt-8">
-          <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-            <p className="text-[11px] text-gray-500 uppercase tracking-[0.1em]">
-              © {new Date().getFullYear()} MeleRoller. Todos los derechos reservados.
-            </p>
+        
+        {/* Second Row - Adniverse Logo */}
+        <div 
+          className="row"
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            margin: '0 -15px',
+            padding: 0,
+            width: '100%',
+            boxSizing: 'border-box'
+          }}
+        >
+          <div 
+            className="col-md-12 text-center"
+            style={{
+              flex: '0 0 100%',
+              maxWidth: '100%',
+              padding: '8px 15px',
+              margin: 0,
+              boxSizing: 'border-box',
+              textAlign: 'center'
+            }}
+          >
+            {/* Logo de agencia oculto temporalmente */}
+            {/* <div
+              className="line"
+              style={{
+                background: '#555555',
+                height: '0.025em',
+                width: '100%',
+                marginBottom: '12px'
+              }}
+            />
+            <a 
+              href="http://adniverse.ar/" 
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-block' }}
+            >
+              <img 
+                src="/images/adniverse.svg" 
+                alt="Adniverse" 
+                width={90}
+                style={{ display: 'block', margin: '0 auto' }}
+              />
+            </a> */}
           </div>
         </div>
       </div>

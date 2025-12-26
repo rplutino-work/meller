@@ -1,7 +1,8 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Ruler, Phone } from 'lucide-react'
+import { X } from 'lucide-react'
+import Image from 'next/image'
 
 interface MeasureModalProps {
   isOpen: boolean
@@ -19,75 +20,205 @@ export default function MeasureModal({ isOpen, onClose }: MeasureModalProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 modal-backdrop z-50"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
           />
 
           {/* Modal */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-lg md:w-full bg-white rounded-2xl shadow-2xl z-50 overflow-hidden"
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-3xl md:w-full bg-white shadow-2xl z-50 overflow-hidden"
+            style={{ borderRadius: '0' }}
           >
-            <div className="p-6 md:p-8">
+            {/* Header oscuro */}
+            <div style={{
+              background: 'rgba(0, 0, 0, 0.8)',
+              padding: '15px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              position: 'relative'
+            }}>
+              <h3 style={{
+                color: 'white',
+                fontSize: '24px',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                margin: 0,
+                width: '100%',
+                textAlign: 'center',
+                fontFamily: 'Oswald, sans-serif'
+              }}>
+                CÓMO MEDIR TUS VENTANAS
+              </h3>
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                style={{
+                  position: 'absolute',
+                  right: '15px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#999',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '20px',
+                  transition: 'color 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = 'white'}
+                onMouseLeave={(e) => e.currentTarget.style.color = '#999'}
               >
                 <X size={20} />
               </button>
+            </div>
 
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary/10 rounded-full mb-4">
-                  <Ruler className="w-8 h-8 text-secondary" />
+            {/* Body */}
+            <div style={{
+              padding: '30px',
+              fontFamily: 'Oswald, sans-serif'
+            }}>
+              {/* Texto de instrucciones */}
+              <p style={{
+                color: '#000',
+                fontSize: '18px',
+                lineHeight: '1.6',
+                marginBottom: '24px',
+                textAlign: 'center'
+              }}>
+                Medir el ancho de la ventana teniendo en cuenta los marcos de la misma, a esta medida es conveniente que exceda 10 cm de cada lado. En el alto lo mismo, agregar 10 cm de cada lado.
+              </p>
+
+              {/* Imágenes lado a lado */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '0',
+                marginBottom: '24px',
+                flexWrap: 'wrap'
+              }}>
+                <div style={{
+                  width: '41.66667%',
+                  marginLeft: '8.33333%',
+                  marginRight: '0',
+                  padding: '0 15px'
+                }}>
+                  <Image
+                    src="/images/medir-1.png"
+                    alt="Diagrama de medida de ancho"
+                    width={344}
+                    height={301}
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      display: 'block',
+                      margin: '0 auto'
+                    }}
+                  />
                 </div>
-                <h3 className="text-2xl font-bold text-primary">
-                  CÓMO MEDIR TUS VENTANAS
-                </h3>
+                <div style={{
+                  width: '41.66667%',
+                  marginLeft: '0',
+                  marginRight: '0',
+                  padding: '0 15px'
+                }}>
+                  <Image
+                    src="/images/medir-2.png"
+                    alt="Diagrama de medida de alto"
+                    width={344}
+                    height={301}
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      display: 'block',
+                      margin: '0 auto'
+                    }}
+                  />
+                </div>
               </div>
 
-              <div className="space-y-6">
-                <p className="text-gray-600 leading-relaxed">
-                  Medir el ancho de la ventana teniendo en cuenta los marcos de la misma, 
-                  a esta medida es conveniente que exceda <strong>10 cm de cada lado</strong>.
+              {/* Fórmula */}
+              <div style={{
+                textAlign: 'center',
+                marginBottom: '24px'
+              }}>
+                <span style={{
+                  background: 'black',
+                  color: 'white',
+                  padding: '8px 16px',
+                  fontSize: '16px',
+                  fontWeight: 400,
+                  letterSpacing: '0.05em',
+                  display: 'inline-block',
+                  fontFamily: 'Oswald, sans-serif'
+                }}>
+                  ANCHO TOTAL EN CM = x+20
+                </span>
+              </div>
+
+              {/* Información de contacto */}
+              <div style={{
+                textAlign: 'center',
+                marginBottom: '16px'
+              }}>
+                <p style={{
+                  fontSize: '18px',
+                  color: '#000',
+                  marginBottom: '8px',
+                  lineHeight: '1.6',
+                  fontWeight: 300
+                }}>
+                  Para asesoramiento técnico visitenos en:<br />
+                  Pres. Juan D. Perón 1154, Burzaco.
                 </p>
+              </div>
 
-                <p className="text-gray-600 leading-relaxed">
-                  En el alto lo mismo, agregar <strong>10 cm de cada lado</strong>.
-                </p>
-
-                <div className="bg-secondary/10 rounded-xl p-6 text-center">
-                  <p className="text-xl font-bold text-primary mb-2">
-                    ANCHO TOTAL EN CM = x + 20
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    (ancho de ventana + 10cm izquierda + 10cm derecha)
-                  </p>
-                </div>
-
-                <div className="border-t pt-6">
-                  <p className="text-sm text-gray-500 mb-4 text-center">
-                    Para asesoramiento técnico visitenos en:
-                  </p>
-                  <p className="text-center font-medium text-primary mb-4">
-                    Pres. Juan D. Perón 1154, Burzaco.
-                  </p>
+              {/* WhatsApp */}
+              <div style={{
+                textAlign: 'center'
+              }}>
+                <p style={{
+                  fontSize: '24px',
+                  fontWeight: 300,
+                  margin: 0,
+                  color: '#000'
+                }}>
                   <a
-                    href="tel:1122729695"
-                    className="flex items-center justify-center gap-2 text-secondary hover:text-accent transition-colors"
+                    href="https://wa.me/541122729695?text=Hola!"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      fontSize: '24px',
+                      fontWeight: 600,
+                      color: '#000',
+                      textDecoration: 'none',
+                      transition: 'opacity 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                   >
-                    <Phone size={18} />
-                    <span className="font-medium">11 2272 9695</span>
+                    <Image
+                      src="/images/whatsapp-ico.png"
+                      alt="WhatsApp"
+                      width={30}
+                      height={30}
+                      style={{
+                        marginBottom: '7px',
+                        verticalAlign: 'middle'
+                      }}
+                    />
+                    <span>11 2272 9695</span>
                   </a>
-                </div>
+                </p>
               </div>
-
-              <button
-                onClick={onClose}
-                className="w-full mt-6 bg-secondary text-white py-3 rounded-lg font-medium hover:bg-accent transition-colors"
-              >
-                Entendido
-              </button>
             </div>
           </motion.div>
         </>
@@ -95,4 +226,3 @@ export default function MeasureModal({ isOpen, onClose }: MeasureModalProps) {
     </AnimatePresence>
   )
 }
-

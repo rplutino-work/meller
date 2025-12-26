@@ -135,6 +135,72 @@ main {
   color: #fff;
 }
 
+/* Bootstrap-like grid for Values Section */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -15px;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 991px) {
+  .row {
+    flex-direction: column;
+  }
+  
+  .values-col {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .col-md-6,
+  .col-md-5 {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+}
+
+/* Contact section columns */
+.col-md-6 {
+  flex: 0 0 50%;
+  max-width: 50%;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+.col-md-5 {
+  flex: 0 0 41.666667%;
+  max-width: 41.666667%;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+.col-md-offset-1 {
+  margin-left: 8.333333%;
+}
+
+/* Footer - Clear float */
+.footer .row::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Footer responsive */
+@media (max-width: 991px) {
+  .footer .col-md-6,
+  .footer .col-md-3 {
+    width: 100% !important;
+    float: none !important;
+  }
+  
+  .footer .list-inline {
+    justify-content: flex-start;
+  }
+}
+
 /* WhatsApp Button */
 .whatsapp-btn {
   position: fixed;
@@ -331,5 +397,180 @@ main {
     left: 20px;
     padding: 10px 15px;
     font-size: 13px;
+  }
+}
+
+/* Animación de letras para "SOMOS ESPECIALISTAS EN CORTINAS" */
+#titulo-animado {
+  display: inline-block;
+  overflow: hidden;
+}
+
+.letra {
+  display: inline-block;
+  transform: translateY(110%);
+  opacity: 0;
+  transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+#titulo-animado.animar .letra {
+  animation: revelarLetra 0.6s forwards;
+  animation-delay: calc(0.05s * var(--i));
+}
+
+@keyframes revelarLetra {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Products Grid Section */
+#cortinas {
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+}
+
+#cortinas .grid {
+  display: block;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  font-size: 0; /* Remove whitespace between inline-block elements */
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+#cortinas .grid::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Effect Chico Styles */
+.effect-chico {
+  display: inline-block;
+  position: relative;
+  width: 479.992px;
+  height: 400px;
+  margin: -2.16px;
+  padding: 0;
+  background-color: #000;
+  overflow: hidden;
+  cursor: pointer;
+  vertical-align: top;
+}
+
+.effect-chico .product-image {
+  transition: opacity 0.35s, transform 0.35s;
+  transform: scale(1.12);
+  opacity: 0.6;
+}
+
+.effect-chico:hover .product-image {
+  opacity: 0.5;
+  transform: scale(1);
+}
+
+.effect-chico .product-figcaption {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 3em;
+  background-color: rgba(0, 0, 0, 0);
+  opacity: 1;
+  transition: all 0.35s;
+}
+
+.effect-chico .product-figcaption::before {
+  position: absolute;
+  inset: 30px;
+  border: 1px solid rgb(255, 255, 255);
+  content: "";
+  transform: scale(1.1);
+  opacity: 0;
+  transition: opacity 0.35s, transform 0.35s;
+}
+
+.effect-chico:hover .product-figcaption::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.effect-chico h2 {
+  font-size: 52px;
+  font-weight: 300;
+  color: #fff;
+  font-family: 'Oswald', sans-serif;
+  text-transform: uppercase;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.effect-chico h2.xxlarge {
+  font-size: 52px;
+}
+
+.effect-chico.special-1 h2,
+.effect-chico.special-2 h2 {
+  font-size: 34px;
+}
+
+.effect-chico h2 span {
+  font-weight: 500;
+  font-family: 'Oswald', sans-serif;
+}
+
+.effect-chico a {
+  font-size: 0;
+  font-weight: 400;
+  color: #000;
+  text-decoration: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  z-index: 1000;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+/* Special variants */
+.effect-chico.special-1 h2,
+.effect-chico.special-2 h2 {
+  font-size: 34px;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .effect-chico {
+    width: 50%;
+    margin: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .effect-chico {
+    width: 100%;
+    margin: 0;
+  }
+  
+  .effect-chico h2.xxlarge {
+    font-size: 36px;
+  }
+  
+  .effect-chico.special-1 h2,
+  .effect-chico.special-2 h2 {
+    font-size: 28px;
   }
 }

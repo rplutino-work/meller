@@ -36,10 +36,10 @@ export async function createMercadoPagoPreference(data: {
   token: string
 }) {
   try {
-    // Usar VERCEL_URL si está disponible (automático en Vercel), sino NEXT_PUBLIC_BASE_URL
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}`
-      : (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000')
+    // Prioridad: NEXT_PUBLIC_BASE_URL > VERCEL_URL > localhost
+    // NEXT_PUBLIC_BASE_URL se usa cuando hay dominio personalizado
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL 
+      || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
     
     const successUrl = `${baseUrl}/pagar/${data.token}?status=success`
     const failureUrl = `${baseUrl}/pagar/${data.token}?status=failure`
