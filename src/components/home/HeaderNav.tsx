@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const navigation = [
@@ -35,16 +36,21 @@ export default function HeaderNav() {
           transition={{ duration: 0.3 }}
           className="fixed top-0 left-0 right-0 z-50 bg-black shadow-lg"
         >
-          <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
+          <div style={{ padding: '0px 3rem 0 2.3rem' }}>
             <div className="flex items-center justify-between h-[65px]">
               {/* Logo */}
               <Link href="/" className="flex items-center">
-                <span className="border-2 border-white px-2.5 py-0.5 text-[14px] font-medium tracking-wider text-white">
-                  MELE
-                </span>
-                <span className="text-[14px] font-light tracking-wider ml-0.5 text-white">
-                  ROLLER
-                </span>
+                <div className="relative" style={{ height: '40px', minWidth: '120px' }}>
+                  <Image
+                    src="/images/logos/logo-horizontal.png"
+                    alt="MELE ROLLER"
+                    width={500}
+                    height={78}
+                    style={{ height: '100%', width: '100%', objectFit: 'cover', objectPosition: 'left center', filter: 'brightness(0) invert(1)' }}
+                    priority
+                    unoptimized
+                  />
+                </div>
               </Link>
 
               {/* Navigation */}

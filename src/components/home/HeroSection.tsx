@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronUp, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import HeaderNav from './HeaderNav'
 
 interface Feature {
@@ -172,17 +173,20 @@ export default function HeroSection() {
         {/* Left side - Content (50%) */}
         <div className="w-full lg:w-1/2 bg-white relative flex flex-col">
           {/* Header interno - NO sticky */}
-          <div className="bg-white" style={{ padding: '0 3rem', border: 'none' }}>
+          <div className="bg-white" style={{ padding: '0px 3rem 0 2.3rem', border: 'none' }}>
             <div className="flex items-center justify-between h-[78px]">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-4">
-                  <div className="flex items-center">
-                    <span className="border-2 border-black px-3 py-1.5 text-[16px] font-semibold tracking-[0.05em] uppercase">
-                      MELE
-                    </span>
-                    <span className="text-[16px] font-light tracking-[0.05em] uppercase ml-1">
-                      ROLLER
-                    </span>
+                  <div className="relative" style={{ height: '40px', minWidth: '120px' }}>
+                    <Image
+                      src="/images/logos/logo-horizontal.png"
+                      alt="MELE ROLLER"
+                      width={500}
+                      height={78}
+                      style={{ height: '100%', width: '100%', objectFit: 'cover', objectPosition: 'left center' }}
+                      priority
+                      unoptimized
+                    />
                   </div>
                   <span className="hidden lg:block text-[12px] font-light tracking-wide text-black uppercase leading-tight">
                     Cortinas y Cerramientos

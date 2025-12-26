@@ -6,9 +6,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { nombre, email, telefono, direccion, localidad, mensaje } = body
 
-    if (!nombre || !email || !telefono || !direccion) {
+    if (!nombre || !email || !telefono) {
       return NextResponse.json(
-        { error: 'Faltan campos requeridos' },
+        { error: 'Faltan campos requeridos: nombre, email y teléfono son obligatorios' },
         { status: 400 }
       )
     }
@@ -18,17 +18,33 @@ export async function POST(request: NextRequest) {
         nombre,
         email,
         telefono,
-        direccion,
+        direccion: direccion || '',
         localidad: localidad || '',
         mensaje: mensaje || '',
       },
     })
 
     return NextResponse.json({ success: true, data: solicitud })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating solicitud visita:', error)
+    
+    // Manejar errores específicos de Prisma
+    if (error.code === 'P2002') {
+      return NextResponse.json(
+        { error: 'Ya existe una solicitud con estos datos' },
+        { status: 409 }
+      )
+    }
+    
+    if (error.message?.includes('connection') || error.message?.includes('Closed')) {
+      return NextResponse.json(
+        { error: 'Error de conexión a la base de datos. Por favor, intentá de nuevo más tarde.' },
+        { status: 503 }
+      )
+    }
+
     return NextResponse.json(
-      { error: 'Error al procesar la solicitud' },
+      { error: error.message || 'Error al procesar la solicitud' },
       { status: 500 }
     )
   }

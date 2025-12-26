@@ -440,18 +440,25 @@ export default function VisitasPage() {
       {/* Detail Modal */}
       <AnimatePresence>
         {modalOpen && selectedSolicitud && (
-          <>
+          <div style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 10000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setModalOpen(false)}
               style={{
-                position: 'fixed',
+                position: 'absolute',
                 inset: 0,
                 background: 'rgba(15, 23, 42, 0.7)',
-                backdropFilter: 'blur(4px)',
-                zIndex: 50
+                backdropFilter: 'blur(4px)'
               }}
             />
             <motion.div
@@ -460,20 +467,17 @@ export default function VisitasPage() {
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               onClick={(e) => e.stopPropagation()}
               style={{
-                position: 'fixed',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '90%',
+                position: 'relative',
+                width: '100%',
                 maxWidth: '600px',
                 maxHeight: '90vh',
                 background: 'white',
                 borderRadius: '16px',
                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                zIndex: 50,
                 overflow: 'hidden',
                 display: 'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                zIndex: 1
               }}
             >
               <div style={{
@@ -684,7 +688,7 @@ export default function VisitasPage() {
                 </a>
               </div>
             </motion.div>
-          </>
+          </div>
         )}
       </AnimatePresence>
     </div>

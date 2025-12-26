@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const navigation = [
@@ -63,13 +64,16 @@ export default function Header() {
             <div className="flex items-center justify-between h-[80px]">
               {/* Logo */}
               <Link href="/" className="flex items-center gap-5">
-                <div className="flex items-center">
-                  <span className="border border-black px-3 py-1.5 text-[16px] font-medium tracking-[0.15em]">
-                    MELE
-                  </span>
-                  <span className="text-[16px] font-light tracking-[0.15em] ml-1">
-                    ROLLER
-                  </span>
+                <div className="relative" style={{ height: '40px', minWidth: '120px' }}>
+                  <Image
+                    src="/images/logos/logo-horizontal.png"
+                    alt="MELE ROLLER"
+                    width={500}
+                    height={78}
+                    style={{ height: '100%', width: '100%', objectFit: 'cover', objectPosition: 'left center' }}
+                    priority
+                    unoptimized
+                  />
                 </div>
                 <span className="hidden md:block text-[11px] tracking-[0.2em] text-gray-400 uppercase">
                   Cortinas y Cerramientos

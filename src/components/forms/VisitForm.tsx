@@ -62,13 +62,17 @@ export default function VisitForm({ variant = 'full' }: VisitFormProps) {
         body: JSON.stringify(data),
       })
 
-      if (!response.ok) throw new Error('Error al enviar la solicitud')
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al enviar la solicitud')
+      }
 
       setIsSuccess(true)
       reset()
       setTimeout(() => setIsSuccess(false), 5000)
-    } catch {
-      setError('Hubo un error al enviar tu solicitud. Por favor, intentá de nuevo.')
+    } catch (err: any) {
+      setError(err.message || 'Hubo un error al enviar tu solicitud. Por favor, intentá de nuevo.')
     } finally {
       setIsSubmitting(false)
     }
