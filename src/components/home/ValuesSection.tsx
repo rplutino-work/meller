@@ -42,7 +42,9 @@ export default function ValuesSection() {
         backgroundColor: '#fff',
         background: '#fff',
         position: 'relative',
-        zIndex: 1
+        zIndex: 1,
+        display: 'flex',
+        justifyContent: 'center'
       }}
       className="container-fluid"
       >

@@ -45,7 +45,7 @@ export default function PromoBanner() {
         margin: 0,
         padding: 0,
         position: 'relative',
-        zIndex: 1029,
+        zIndex: 1028,
         overflow: 'hidden',
         left: 0,
         right: 0

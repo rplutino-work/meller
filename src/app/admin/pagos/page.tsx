@@ -27,8 +27,14 @@ interface Pago {
   maxCuotas: number
   estado: string
   token: string
+  proveedor: string
+  metodoPago: string | null
   mercadoPagoId: string | null
   mercadoPagoStatus: string | null
+  mercadoPagoInitPoint: string | null
+  prismaPaymentId: string | null
+  prismaInitPoint: string | null
+  prismaStatus: string | null
   fechaPago: string | null
   createdAt: string
   updatedAt: string
@@ -62,6 +68,7 @@ export default function PagosPage() {
     monto: '',
     maxCuotas: '1',
     estado: 'GENERADO',
+    proveedor: 'mercadopago', // 'mercadopago' o 'prisma'
     metodoPago: 'checkout', // 'checkout' o 'gateway'
   })
 
@@ -97,6 +104,7 @@ export default function PagosPage() {
       monto: '',
       maxCuotas: '1',
       estado: 'GENERADO',
+      proveedor: 'mercadopago',
       metodoPago: 'checkout',
     })
     setModalOpen(true)
@@ -112,7 +120,8 @@ export default function PagosPage() {
       monto: pago.monto.toString(),
       maxCuotas: pago.maxCuotas.toString(),
       estado: pago.estado,
-      metodoPago: 'checkout', // Los pagos existentes usan checkout
+      proveedor: pago.proveedor || 'mercadopago',
+      metodoPago: pago.metodoPago || 'checkout',
     })
     setModalOpen(true)
   }
@@ -674,33 +683,124 @@ export default function PagosPage() {
                   </div>
 
                   {isCreating && (
-                    <div>
-                      <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px' }}>
-                        Método de Pago
-                      </label>
-                      <select
-                        value={formData.metodoPago}
-                        onChange={(e) => setFormData({ ...formData, metodoPago: e.target.value })}
-                        style={{
-                          width: '100%',
-                          padding: '10px 14px',
-                          border: '1px solid #e5e7eb',
+                    <>
+                      {/* Selector de Proveedor */}
+                      <div>
+                        <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px' }}>
+                          Proveedor de Pago
+                        </label>
+                        <select
+                          value={formData.proveedor}
+                          onChange={(e) => {
+                            const newProveedor = e.target.value
+                            setFormData({ 
+                              ...formData, 
+                              proveedor: newProveedor,
+                              // Si es Prisma, usar QR por defecto. Si es Mercado Pago, usar checkout
+                              metodoPago: newProveedor === 'prisma' ? 'qr' : 'checkout'
+                            })
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '10px 14px',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '8px',
+                            fontSize: '14px',
+                            outline: 'none',
+                            fontFamily: 'inherit',
+                            background: 'white'
+                          }}
+                        >
+                          <option value="mercadopago">Mercado Pago</option>
+                          <option value="prisma">Prisma Medios de Pago (QR)</option>
+                        </select>
+                        <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+                          {formData.proveedor === 'mercadopago' 
+                            ? 'Procesa pagos a través de Mercado Pago'
+                            : 'Procesa pagos mediante código QR con Prisma'}
+                        </p>
+                      </div>
+
+                      {/* Selector de Método - Solo para Mercado Pago */}
+                      {formData.proveedor === 'mercadopago' && (
+                        <div>
+                          <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px' }}>
+                            Método de Pago
+                          </label>
+                          <select
+                            value={formData.metodoPago}
+                            onChange={(e) => setFormData({ ...formData, metodoPago: e.target.value })}
+                            style={{
+                              width: '100%',
+                              padding: '10px 14px',
+                              border: '1px solid #e5e7eb',
+                              borderRadius: '8px',
+                              fontSize: '14px',
+                              outline: 'none',
+                              fontFamily: 'inherit',
+                              background: 'white'
+                            }}
+                          >
+                            <option value="checkout">Checkout (Link de Pago)</option>
+                            <option value="gateway">Gateway (Pago Directo con Tarjeta)</option>
+                          </select>
+                          <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+                            {formData.metodoPago === 'checkout' 
+                              ? 'Genera un link que el cliente puede usar para pagar'
+                              : 'Procesa el pago directamente con los datos de la tarjeta'}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Selector de Método para Prisma */}
+                      {formData.proveedor === 'prisma' && (
+                        <div>
+                          <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px' }}>
+                            Método de Pago
+                          </label>
+                          <select
+                            value={formData.metodoPago}
+                            onChange={(e) => setFormData({ ...formData, metodoPago: e.target.value })}
+                            style={{
+                              width: '100%',
+                              padding: '10px 14px',
+                              border: '1px solid #e5e7eb',
+                              borderRadius: '8px',
+                              fontSize: '14px',
+                              outline: 'none',
+                              fontFamily: 'inherit',
+                              background: 'white'
+                            }}
+                          >
+                            <option value="qr">🔲 Pago por QR (Recomendado)</option>
+                            <option value="checkout" disabled>💳 Pago con Tarjeta (No disponible)</option>
+                          </select>
+                          <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+                            El cliente escanea el código QR con su app bancaria para pagar
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Info para Prisma QR */}
+                      {formData.proveedor === 'prisma' && formData.metodoPago === 'qr' && (
+                        <div style={{
+                          padding: '12px',
+                          background: '#f0f9ff',
+                          border: '1px solid #bae6fd',
                           borderRadius: '8px',
-                          fontSize: '14px',
-                          outline: 'none',
-                          fontFamily: 'inherit',
-                          background: 'white'
-                        }}
-                      >
-                        <option value="checkout">Checkout (Link de Pago)</option>
-                        <option value="gateway">Gateway (Pago Directo con Tarjeta)</option>
-                      </select>
-                      <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
-                        {formData.metodoPago === 'checkout' 
-                          ? 'Genera un link que el cliente puede usar para pagar'
-                          : 'Procesa el pago directamente con los datos de la tarjeta (requiere tokenización)'}
-                      </p>
-                    </div>
+                          fontSize: '13px',
+                          color: '#0369a1'
+                        }}>
+                          <p style={{ margin: 0, fontWeight: 500, marginBottom: '4px' }}>
+                            🔲 Pago con QR
+                          </p>
+                          <p style={{ margin: 0 }}>
+                            Se generará un código QR que el cliente puede escanear con su app bancaria 
+                            (Mercado Pago, BNA+, Modo, etc.) para realizar el pago de forma instantánea.
+                          </p>
+                        </div>
+                      )}
+                    </>
                   )}
 
                   {!isCreating && (

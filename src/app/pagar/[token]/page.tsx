@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { CreditCard, CheckCircle2, XCircle, Clock, Loader2 } from 'lucide-react'
+import { CreditCard, CheckCircle2, XCircle, Clock, Loader2, QrCode } from 'lucide-react'
+import PrismaPaymentForm from '@/components/payments/PrismaPaymentForm'
+import QRPayment from '@/components/payments/QRPayment'
 
 interface Pago {
   id: string
@@ -14,9 +16,14 @@ interface Pago {
   maxCuotas: number
   estado: string
   token: string
+  proveedor: string
+  metodoPago: string | null
   mercadoPagoId: string | null
   mercadoPagoInitPoint: string | null
   mercadoPagoStatus: string | null
+  prismaPaymentId: string | null
+  prismaInitPoint: string | null
+  prismaStatus: string | null
   fechaPago: string | null
   createdAt: string
 }
@@ -93,15 +100,20 @@ export default function PagarPage() {
       const data = await res.json()
       setPago(data)
       
-      // Si tiene init_point de Mercado Pago, usarlo directamente
-      if (data.mercadoPagoInitPoint) {
-        setPaymentUrl(data.mercadoPagoInitPoint)
-      } else if (data.mercadoPagoId) {
-        // Si no tiene init_point pero tiene ID, construir la URL
-        setPaymentUrl(`https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${data.mercadoPagoId}`)
-      } else if (data.estado === 'GENERADO') {
-        // Si no tiene Mercado Pago ID pero está generado, mostrar mensaje
-        console.warn('Pago sin Mercado Pago ID - la preferencia no se creó correctamente')
+      // Determinar la URL de pago según el proveedor
+      if (data.proveedor === 'mercadopago' || !data.proveedor) {
+        // Mercado Pago
+        if (data.mercadoPagoInitPoint) {
+          setPaymentUrl(data.mercadoPagoInitPoint)
+        } else if (data.mercadoPagoId) {
+          setPaymentUrl(`https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${data.mercadoPagoId}`)
+        } else if (data.estado === 'GENERADO') {
+          console.warn('Pago sin Mercado Pago ID - la preferencia no se creó correctamente')
+        }
+      } else if (data.proveedor === 'prisma') {
+        // Prisma - el pago se procesa en esta misma página con formulario
+        // No hay URL externa, el formulario se renderiza directamente
+        setPaymentUrl(null)
       }
     } catch (err: any) {
       setError(err.message || 'Error al cargar el pago')
@@ -514,46 +526,114 @@ export default function PagarPage() {
           </div>
         )}
 
-        {/* Si es método gateway y no tiene init_point, mostrar mensaje informativo */}
-        {!paymentUrl && !pago.mercadoPagoId && !pago.mercadoPagoInitPoint && pago.estado === 'GENERADO' ? (
+        {/* Renderizar formulario según proveedor y método */}
+        {pago.proveedor === 'prisma' && pago.metodoPago === 'qr' && pago.estado === 'GENERADO' ? (
+          // Pago por QR de Prisma
+          <QRPayment
+            token={pago.token}
+            monto={pago.monto}
+            cliente={pago.cliente}
+            onPaymentComplete={(result) => {
+              if (result === 'approved') {
+                fetchPago()
+              }
+            }}
+          />
+        ) : pago.proveedor === 'prisma' && pago.estado === 'GENERADO' ? (
+          // Formulario de pago de Prisma (tarjeta - no disponible actualmente)
           <div style={{
-            padding: '20px',
+            padding: '24px',
             background: '#fef3c7',
             border: '1px solid #fde68a',
-            borderRadius: '8px',
+            borderRadius: '12px',
             textAlign: 'center',
-            color: '#92400e',
-            marginBottom: '16px'
           }}>
-            <p style={{ margin: 0, fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>
-              Pago Gateway
+            <QrCode size={48} style={{ color: '#92400e', margin: '0 auto 16px' }} />
+            <p style={{ color: '#92400e', margin: 0, fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>
+              Pago con tarjeta no disponible
             </p>
-            <p style={{ margin: 0, fontSize: '13px' }}>
-              Este pago se procesará directamente con tarjeta. Por favor, contacta con el administrador para completar el pago.
+            <p style={{ color: '#92400e', margin: 0, fontSize: '13px' }}>
+              Por favor, contactá al administrador para generar un pago por QR o usar Mercado Pago.
             </p>
           </div>
-        ) : paymentUrl ? (
-          <a
-            href={paymentUrl}
-            style={{
-              display: 'block',
-              width: '100%',
-              padding: '16px',
-              background: '#009ee3',
-              color: 'white',
-              borderRadius: '8px',
-              textAlign: 'center',
-              textDecoration: 'none',
-              fontWeight: 600,
-              fontSize: '16px',
-              marginBottom: '16px',
-              transition: 'background 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#0088cc'}
-            onMouseLeave={(e) => e.currentTarget.style.background = '#009ee3'}
-          >
-            Pagar con Mercado Pago
-          </a>
+        ) : pago.proveedor === 'mercadopago' || !pago.proveedor ? (
+          // Mercado Pago
+          <>
+            {/* Si es método gateway y no tiene init_point, mostrar mensaje informativo */}
+            {!paymentUrl && !pago.mercadoPagoId && !pago.mercadoPagoInitPoint && pago.estado === 'GENERADO' ? (
+              <div style={{
+                padding: '20px',
+                background: '#fef3c7',
+                border: '1px solid #fde68a',
+                borderRadius: '8px',
+                textAlign: 'center',
+                color: '#92400e',
+                marginBottom: '16px'
+              }}>
+                <p style={{ margin: 0, fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>
+                  Pago Gateway
+                </p>
+                <p style={{ margin: 0, fontSize: '13px' }}>
+                  Este pago se procesará directamente con tarjeta. Por favor, contacta con el administrador para completar el pago.
+                </p>
+              </div>
+            ) : paymentUrl ? (
+              <a
+                href={paymentUrl}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '16px',
+                  background: '#009ee3',
+                  color: 'white',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  textDecoration: 'none',
+                  fontWeight: 600,
+                  fontSize: '16px',
+                  marginBottom: '16px',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#0088cc'}
+                onMouseLeave={(e) => e.currentTarget.style.background = '#009ee3'}
+              >
+                Pagar con Mercado Pago
+              </a>
+            ) : (
+              <div style={{
+                padding: '16px',
+                background: '#f1f5f9',
+                borderRadius: '8px',
+                textAlign: 'center',
+                color: '#64748b',
+                fontSize: '14px'
+              }}>
+                Generando enlace de pago...
+              </div>
+            )}
+
+            {/* Nota sobre modo Sandbox - Solo en desarrollo */}
+            {typeof window !== 'undefined' && 
+             (window.location.hostname === 'localhost' || window.location.hostname.includes('vercel.app')) ? (
+              <div style={{
+                background: '#fef3c7',
+                border: '1px solid #fde68a',
+                borderRadius: '8px',
+                padding: '16px',
+                marginTop: '16px',
+                marginBottom: '16px'
+              }}>
+                <p style={{ color: '#92400e', margin: 0, fontSize: '13px', fontWeight: 500, marginBottom: '8px' }}>
+                  ⚠️ Modo de Prueba (Sandbox)
+                </p>
+                <p style={{ color: '#92400e', margin: 0, fontSize: '12px', lineHeight: '1.5' }}>
+                  <strong>Usa tarjetas de prueba:</strong> Visa: <strong>4509 9535 6623 3704</strong> | 
+                  Mastercard: <strong>5031 7557 3453 0604</strong><br/>
+                  CVV: cualquier 3 dígitos | Fecha: cualquier fecha futura | DNI: cualquier 8 dígitos
+                </p>
+              </div>
+            ) : null}
+          </>
         ) : (
           <div style={{
             padding: '16px',
@@ -563,31 +643,9 @@ export default function PagarPage() {
             color: '#64748b',
             fontSize: '14px'
           }}>
-            Generando enlace de pago...
+            Proveedor de pago no reconocido
           </div>
         )}
-
-        {/* Nota sobre modo Sandbox - Solo en desarrollo */}
-        {typeof window !== 'undefined' && 
-         (window.location.hostname === 'localhost' || window.location.hostname.includes('vercel.app')) ? (
-          <div style={{
-            background: '#fef3c7',
-            border: '1px solid #fde68a',
-            borderRadius: '8px',
-            padding: '16px',
-            marginTop: '16px',
-            marginBottom: '16px'
-          }}>
-            <p style={{ color: '#92400e', margin: 0, fontSize: '13px', fontWeight: 500, marginBottom: '8px' }}>
-              ⚠️ Modo de Prueba (Sandbox)
-            </p>
-            <p style={{ color: '#92400e', margin: 0, fontSize: '12px', lineHeight: '1.5' }}>
-              <strong>Usa tarjetas de prueba:</strong> Visa: <strong>4509 9535 6623 3704</strong> | 
-              Mastercard: <strong>5031 7557 3453 0604</strong><br/>
-              CVV: cualquier 3 dígitos | Fecha: cualquier fecha futura | DNI: cualquier 8 dígitos
-            </p>
-          </div>
-        ) : null}
 
         <p style={{
           color: '#94a3b8',
@@ -595,7 +653,7 @@ export default function PagarPage() {
           textAlign: 'center',
           marginTop: '24px'
         }}>
-          Tu pago está protegido por Mercado Pago. No almacenamos información de tu tarjeta.
+          Tu pago está protegido. No almacenamos información de tu tarjeta.
         </p>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { generatePaymentToken, createMercadoPagoPreference } from '@/lib/mercado-pago'
+import { createPrismaCheckout, isPrismaConfigured } from '@/lib/prisma-payments'
 
 // GET - Obtener todos los pagos (para admin) o un pago por token
 export async function GET(request: NextRequest) {
@@ -60,19 +61,55 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { cliente, idCliente, idPedido, monto, maxCuotas, estado, metodoPago } = body
+    const { cliente, idCliente, idPedido, monto, maxCuotas, estado, metodoPago, proveedor } = body
 
     // Generar token único
     const token = generatePaymentToken()
 
-    // Crear preferencia en Mercado Pago solo si es método checkout
+    // Variables para almacenar datos del proveedor
     let mercadoPagoId: string | null = null
     let mercadoPagoInitPoint: string | null = null
+    let prismaPaymentId: string | null = null
+    let prismaInitPoint: string | null = null
+    
+    const selectedProveedor = proveedor || 'mercadopago'
+    const selectedMetodo = metodoPago || 'checkout'
 
-    if (metodoPago === 'checkout' || !metodoPago) {
-      // Método Checkout: crear preferencia y generar link
+    if (selectedProveedor === 'mercadopago') {
+      // MERCADO PAGO
+      if (selectedMetodo === 'checkout') {
+        // Método Checkout: crear preferencia y generar link
+        try {
+          const preference = await createMercadoPagoPreference({
+            monto: parseFloat(monto),
+            cliente,
+            idPedido,
+            maxCuotas: parseInt(maxCuotas) || 1,
+            token,
+          })
+          
+          console.log('Mercado Pago preference response:', JSON.stringify(preference, null, 2))
+          
+          mercadoPagoId = preference.id || null
+          mercadoPagoInitPoint = preference.init_point || null
+          
+          console.log('Mercado Pago ID:', mercadoPagoId)
+          console.log('Mercado Pago Init Point:', mercadoPagoInitPoint)
+        } catch (error: any) {
+          console.error('Error creating Mercado Pago preference:', error)
+          console.error('Error details:', error.message, error.response?.data || error.body)
+        }
+      } else if (selectedMetodo === 'gateway') {
+        console.log('Pago creado con Mercado Pago Gateway - se procesará directamente con tarjeta')
+      }
+    } else if (selectedProveedor === 'prisma') {
+      // PRISMA MEDIOS DE PAGO
+      if (!isPrismaConfigured()) {
+        console.warn('Prisma Medios de Pago no está configurado correctamente')
+      }
+      
       try {
-        const preference = await createMercadoPagoPreference({
+        const prismaCheckout = await createPrismaCheckout({
           monto: parseFloat(monto),
           cliente,
           idPedido,
@@ -80,24 +117,17 @@ export async function POST(request: NextRequest) {
           token,
         })
         
-        // Log para debugging
-        console.log('Mercado Pago preference response:', JSON.stringify(preference, null, 2))
+        console.log('Prisma checkout config:', JSON.stringify(prismaCheckout, null, 2))
         
-        // Acceder a los campos correctamente según la estructura de la respuesta
-        mercadoPagoId = preference.id || null
-        mercadoPagoInitPoint = preference.init_point || null
+        // Para Prisma QR, el paymentUrl es la URL interna de la página de pago
+        // El QR se genera dinámicamente cuando el cliente accede a la página
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL 
+          || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+        prismaInitPoint = prismaCheckout.paymentUrl || `${baseUrl}/pagar/${token}?provider=prisma`
         
-        console.log('Mercado Pago ID:', mercadoPagoId)
-        console.log('Mercado Pago Init Point:', mercadoPagoInitPoint)
       } catch (error: any) {
-        console.error('Error creating Mercado Pago preference:', error)
-        console.error('Error details:', error.message, error.response?.data || error.body)
-        // Continuar creando el pago aunque falle Mercado Pago
+        console.error('Error creating Prisma checkout:', error)
       }
-    } else if (metodoPago === 'gateway') {
-      // Método Gateway: el pago se procesará directamente con tarjeta
-      // No creamos preferencia, el pago se procesará cuando se reciban los datos de la tarjeta
-      console.log('Pago creado con método Gateway - se procesará directamente con tarjeta')
     }
 
     // Crear pago en la base de datos
@@ -110,8 +140,12 @@ export async function POST(request: NextRequest) {
         maxCuotas: parseInt(maxCuotas) || 1,
         estado: estado || 'GENERADO',
         token,
+        proveedor: selectedProveedor,
+        metodoPago: selectedMetodo,
         mercadoPagoId,
         mercadoPagoInitPoint,
+        prismaPaymentId,
+        prismaInitPoint,
       },
     })
 

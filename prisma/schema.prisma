@@ -97,11 +97,24 @@ model Pago {
   idPedido            String?
   monto               Float
   maxCuotas           Int      @default(1)
-  estado              String   @default("GENERADO") // GENERADO, APROBADO, RECHAZADO
+  estado              String   @default("GENERADO") // GENERADO, APROBADO, RECHAZADO, PENDIENTE
   token               String   @unique // Token único para la URL de pago
+  
+  // Proveedor de pago
+  proveedor           String   @default("mercadopago") // mercadopago, prisma
+  metodoPago          String?  // checkout, gateway, decidir
+  
+  // Mercado Pago
   mercadoPagoId       String?  // ID de la preferencia de Mercado Pago
   mercadoPagoInitPoint String? // URL de pago de Mercado Pago
   mercadoPagoStatus   String?  // Estado del pago en Mercado Pago
+  
+  // Prisma Medios de Pago (Decidir)
+  prismaPaymentId     String?  // ID del pago en Prisma/Decidir
+  prismaInitPoint     String?  // URL de pago de Prisma
+  prismaStatus        String?  // Estado del pago en Prisma
+  prismaTransactionId String?  // ID de transacción en Prisma
+  
   fechaPago           DateTime? // Fecha cuando se aprobó el pago
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt

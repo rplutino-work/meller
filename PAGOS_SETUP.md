@@ -1,4 +1,8 @@
-# Sistema de Gestión de Pagos con Mercado Pago
+# Sistema de Gestión de Pagos
+
+El sistema soporta dos proveedores de pago:
+- **Mercado Pago** - Checkout externo y Gateway
+- **Prisma Medios de Pago** - Pago directo con tarjeta (Decidir)
 
 ## Configuración
 
@@ -9,6 +13,12 @@ Agrega las siguientes variables a tu archivo `.env`:
 ```env
 # Mercado Pago
 MERCADOPAGO_ACCESS_TOKEN=tu_access_token_de_mercadopago
+
+# Prisma Medios de Pago (opcional)
+PRISMA_API_URL=https://live.decidir.com/api/v2
+PRISMA_PUBLIC_KEY=tu_public_key
+PRISMA_PRIVATE_KEY=tu_private_key
+PRISMA_SITE_ID=tu_site_id
 
 # Base URL (para webhooks y redirects)
 NEXT_PUBLIC_BASE_URL=http://localhost:3000  # En producción: https://tudominio.com
@@ -21,6 +31,15 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000  # En producción: https://tudominio.
 3. Obtén tu Access Token (Production o Test)
 4. Agrega el token a tu `.env`
 
+### Obtener Credenciales de Prisma Medios de Pago
+
+1. Ve a [Prisma Developers](https://developers.prismamediosdepago.com/portal/)
+2. Accede a tu cuenta de comercio
+3. Obtén tu Public Key, Private Key y Site ID
+4. Agrega las credenciales a tu `.env`
+
+> Para más detalles sobre Prisma, consulta `PRISMA_PAYMENTS_SETUP.md`
+
 ## Funcionalidades Implementadas
 
 ### 1. Modelo de Base de Datos
@@ -30,11 +49,14 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000  # En producción: https://tudominio.
 
 ### 2. API Routes
 - `GET /api/pagos` - Listar pagos (con filtros por estado, últimos 30 días, o por token)
-- `POST /api/pagos` - Crear nuevo pago (genera token y preferencia de Mercado Pago)
+- `POST /api/pagos` - Crear nuevo pago (genera token y preferencia según proveedor)
 - `GET /api/pagos/[id]` - Obtener pago por ID
 - `PUT /api/pagos/[id]` - Actualizar pago
 - `DELETE /api/pagos/[id]` - Eliminar pago
-- `POST /api/pagos/mercado-pago/webhook` - Webhook para recibir notificaciones de Mercado Pago
+- `POST /api/pagos/mercado-pago/webhook` - Webhook para Mercado Pago
+- `POST /api/pagos/prisma/process` - Procesar pago con Prisma
+- `POST /api/pagos/prisma/webhook` - Webhook para Prisma
+- `GET /api/pagos/prisma/config` - Configuración pública de Prisma
 
 ### 3. Página de Administración
 - `/admin/pagos` - Gestión completa de pagos
@@ -49,14 +71,18 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000  # En producción: https://tudominio.
 ### 4. Página Pública de Pago
 - `/pagar/[token]` - Página donde los usuarios realizan el pago
   - Muestra información del pago
-  - Botón para pagar con Mercado Pago
+  - **Mercado Pago**: Botón para pagar con Mercado Pago (checkout externo)
+  - **Prisma**: Formulario de pago con tarjeta (pago directo)
   - Manejo de estados (aprobado, rechazado, pendiente)
   - Redirección automática después del pago
 
 ## Flujo de Pago
 
+### Con Mercado Pago
+
 1. **Admin crea un pago:**
    - Ingresa cliente, monto, pedido, etc.
+   - Selecciona "Mercado Pago" como proveedor
    - El sistema genera un token único
    - Se crea una preferencia en Mercado Pago
    - Se guarda el pago en la base de datos
@@ -75,9 +101,32 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000  # En producción: https://tudominio.
    - Webhook actualiza el estado del pago
    - El cliente es redirigido de vuelta con el estado
 
-5. **Admin ve el resultado:**
-   - Los pagos aprobados aparecen en "Pagos Aprobados"
-   - Los pagos rechazados aparecen en "Pagos Pendientes" con estado RECHAZADO
+### Con Prisma
+
+1. **Admin crea un pago:**
+   - Ingresa cliente, monto, pedido, etc.
+   - Selecciona "Prisma Medios de Pago" como proveedor
+   - El sistema genera un token único
+   - Se guarda el pago en la base de datos
+
+2. **Admin copia el link:**
+   - El link tiene el formato: `https://tudominio.com/pagar/[token]`
+   - Se envía al cliente
+
+3. **Cliente realiza el pago:**
+   - Accede al link
+   - Ve un formulario para ingresar los datos de la tarjeta
+   - Completa nombre, número, vencimiento, CVV, documento
+   - El pago se procesa directamente con Prisma
+
+4. **Resultado:**
+   - Se muestra el resultado inmediato (aprobado/rechazado)
+   - El webhook de Prisma puede actualizar el estado posteriormente
+
+### Resultado en el Admin
+
+- Los pagos aprobados aparecen en "Pagos Aprobados"
+- Los pagos rechazados aparecen en "Pagos Pendientes" con estado RECHAZADO
 
 ## Configuración de Webhook en Mercado Pago
 

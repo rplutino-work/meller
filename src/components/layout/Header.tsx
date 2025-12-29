@@ -168,44 +168,22 @@ export default function Header() {
                       </ul>
                     </div>
 
-                    {/* Sillones */}
+                    {/* Toldos */}
                     <div>
                       <h3 className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-8">
-                        Sillones
-                      </h3>
-                      <ul className="space-y-4">
-                        {['Tradicionales', 'Puff Movibles', 'Restauración'].map((item, index) => (
-                          <motion.li 
-                            key={item}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.3 + index * 0.04 }}
-                          >
-                            <Link
-                              href={`/sillones#${item.toLowerCase().replace(' ', '-')}`}
-                              className="text-[28px] lg:text-[32px] font-serif font-light hover:text-gray-400 transition-colors leading-tight block"
-                              onClick={() => setMobileMenuOpen(false)}
-                            >
-                              {item}
-                            </Link>
-                          </motion.li>
-                        ))}
-                      </ul>
-
-                      <h3 className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-8 mt-10">
                         Toldos
                       </h3>
                       <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.42 }}
+                        transition={{ delay: 0.3 }}
                       >
                         <Link
                           href="/toldos"
                           className="text-[28px] lg:text-[32px] font-serif font-light hover:text-gray-400 transition-colors leading-tight block"
                           onClick={() => setMobileMenuOpen(false)}
                         >
-                          Toldos y cerramientos
+                          Toldos
                         </Link>
                       </motion.div>
                     </div>
