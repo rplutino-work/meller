@@ -123,7 +123,7 @@ export default function LoginPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="admin@meleroller.com.ar"
+                      placeholder="tu@email.com"
                       required
                       style={{
                         width: '100%',
@@ -291,78 +291,6 @@ export default function LoginPage() {
                 </button>
               </div>
             </form>
-
-            {/* Demo credentials */}
-            <div style={{
-              marginTop: '32px',
-              padding: '20px',
-              background: '#f8fafc',
-              borderRadius: '8px',
-              border: '1px solid #e2e8f0'
-            }}>
-              <p style={{
-                fontSize: '13px',
-                fontWeight: 600,
-                color: '#1e293b',
-                margin: '0 0 12px 0'
-              }}>
-                Credenciales de prueba
-              </p>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '12px'
-              }}>
-                <div style={{
-                  padding: '12px',
-                  background: 'white',
-                  borderRadius: '6px',
-                  border: '1px solid #e5e7eb'
-                }}>
-                  <p style={{
-                    fontSize: '11px',
-                    color: '#64748b',
-                    margin: '0 0 4px 0',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}>
-                    Email
-                  </p>
-                  <code style={{
-                    fontSize: '13px',
-                    color: '#1e293b',
-                    fontWeight: 600,
-                    fontFamily: 'monospace'
-                  }}>
-                    admin@meleroller.com.ar
-                  </code>
-                </div>
-                <div style={{
-                  padding: '12px',
-                  background: 'white',
-                  borderRadius: '6px',
-                  border: '1px solid #e5e7eb'
-                }}>
-                  <p style={{
-                    fontSize: '11px',
-                    color: '#64748b',
-                    margin: '0 0 4px 0',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}>
-                    Contraseña
-                  </p>
-                  <code style={{
-                    fontSize: '13px',
-                    color: '#1e293b',
-                    fontWeight: 600,
-                    fontFamily: 'monospace'
-                  }}>
-                    admin123
-                  </code>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </motion.div>

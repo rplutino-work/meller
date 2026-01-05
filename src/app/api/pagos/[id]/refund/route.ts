@@ -1,12 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { MercadoPagoConfig, Payment } from 'mercadopago'
-
-const client = new MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || '',
-})
-
-const payment = new Payment(client)
 
 // POST - Devolver un pago en Mercado Pago
 export async function POST(
@@ -43,13 +36,28 @@ export async function POST(
       try {
         const refundAmount = amount ? parseFloat(amount) : pago.monto
         
-        // Hacer el reembolso en Mercado Pago
-        const refund = await payment.refund({
-          id: parseInt(pago.mercadoPagoId),
-          body: {
-            amount: refundAmount,
-          },
-        })
+        // Hacer el reembolso en Mercado Pago usando la API REST directamente
+        const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN
+        const refundResponse = await fetch(
+          `https://api.mercadopago.com/v1/payments/${pago.mercadoPagoId}/refunds`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              amount: refundAmount,
+            }),
+          }
+        )
+
+        if (!refundResponse.ok) {
+          const errorData = await refundResponse.json()
+          throw new Error(errorData.message || 'Error al procesar reembolso en Mercado Pago')
+        }
+
+        const refund = await refundResponse.json()
 
         // Actualizar el estado del pago en la base de datos
         await prisma.pago.update({

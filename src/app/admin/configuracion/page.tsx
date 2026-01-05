@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { FileText, Mail, Bell, ChevronRight, Settings, Palette, Globe, Sparkles, Image, Wrench } from 'lucide-react'
+import { FileText, Mail, Bell, ChevronRight, Settings, Palette, Globe, Sparkles, Image, Wrench, Users } from 'lucide-react'
 
 const configuraciones = [
   {
@@ -39,6 +39,13 @@ const configuraciones = [
     description: 'Activa o desactiva la pantalla de mantenimiento.',
     icon: Wrench,
     href: '/admin/configuracion/mantenimiento',
+  },
+  {
+    id: 'usuarios',
+    title: 'Usuarios',
+    description: 'Gestiona usuarios y permisos del sistema (solo superadmin).',
+    icon: Users,
+    href: '/admin/configuracion/usuarios',
   },
 ]
 
