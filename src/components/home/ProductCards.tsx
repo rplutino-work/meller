@@ -13,7 +13,7 @@ const products = [
     image: '/images/products/cortinas-roller-blackout-mele-roller-03.jpg',
     href: '/cortinas/blackout',
     className: 'effect-chico',
-    fontSize: '52px',
+    fontSize: '42px',
   },
   {
     id: 2,
@@ -22,7 +22,7 @@ const products = [
     image: '/images/products/cortina-roller-sunscreen-05.jpg',
     href: '/cortinas/sunscreen',
     className: 'effect-chico',
-    fontSize: '52px',
+    fontSize: '42px',
   },
   {
     id: 3,
@@ -31,7 +31,7 @@ const products = [
     image: '/images/products/cortina-eclipse-mele-roller-01.jpg',
     href: '/cortinas/eclipse',
     className: 'effect-chico special-2',
-    fontSize: '34px',
+    fontSize: '42px',
   },
   {
     id: 4,
@@ -40,7 +40,7 @@ const products = [
     image: '/images/products/paneles-orientales-mele-roller-04.jpg',
     href: '/cortinas/orientales',
     className: 'effect-chico special-1',
-    fontSize: '34px',
+    fontSize: '42px',
   },
   {
     id: 5,
@@ -49,7 +49,7 @@ const products = [
     image: '/images/products/cortinas-romanas-mele-roller-06.jpg',
     href: '/cortinas/romanas',
     className: 'effect-chico special-2',
-    fontSize: '34px',
+    fontSize: '42px',
   },
   {
     id: 6,
@@ -58,7 +58,7 @@ const products = [
     image: '/images/products/cortina-tradicional-mele-roller-07.jpg',
     href: '/cortinas/tradicionales',
     className: 'effect-chico special-2',
-    fontSize: '34px',
+    fontSize: '42px',
   },
 ]
 
@@ -194,7 +194,7 @@ export default function ProductCards() {
                     left: '50%',
                     top: '50%',
                     transform: 'translate(-50%, -50%)',
-                    lineHeight: product.fontSize === '52px' ? '57.2px' : '37.4px',
+                    lineHeight: '46.2px',
                     letterSpacing: 'normal',
                     fontStyle: 'normal'
                   }}

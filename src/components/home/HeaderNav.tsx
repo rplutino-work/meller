@@ -6,13 +6,13 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const navigation = [
-  { name: 'Black Out', href: '/blackout' },
-  { name: 'SunScreen', href: '/sunscreen' },
-  { name: 'Romanas', href: '/romanas' },
-  { name: 'Orientales', href: '/orientales' },
-  { name: 'Tradicionales', href: '/tradicionales' },
-  { name: 'Eclipse', href: '/eclipse' },
-  { name: 'Bandas Verticales', href: '/bandas-verticales' },
+  { name: 'Blackout', href: '/cortinas/blackout' },
+  { name: 'SunScreen', href: '/cortinas/sunscreen' },
+  { name: 'Romanas', href: '/cortinas/romanas' },
+  { name: 'Orientales', href: '/cortinas/orientales' },
+  { name: 'Tradicionales', href: '/cortinas/tradicionales' },
+  { name: 'Eclipse', href: '/cortinas/eclipse' },
+  { name: 'Bandas Verticales', href: '/cortinas/bandas-verticales' },
 ]
 
 export default function HeaderNav() {

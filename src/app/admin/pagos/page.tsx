@@ -182,16 +182,25 @@ export default function PagosPage() {
   }
 
   async function handleDevolver(id: string) {
-    if (!confirm('¿Desea devolver este pago?')) return
+    if (!confirm('¿Desea devolver este pago? Esto procesará el reembolso en Mercado Pago.')) return
     try {
-      await fetch(`/api/pagos/${id}`, {
-        method: 'PUT',
+      const response = await fetch(`/api/pagos/${id}/refund`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ estado: 'GENERADO', fechaPago: null }),
+        body: JSON.stringify({}),
       })
-      await fetchPagos()
+      
+      const result = await response.json()
+      
+      if (response.ok) {
+        alert('Pago devuelto exitosamente. El reembolso se procesará en Mercado Pago.')
+        await fetchPagos()
+      } else {
+        alert(`Error al devolver el pago: ${result.error || result.details || 'Error desconocido'}`)
+      }
     } catch (error) {
       console.error('Error devolviendo pago:', error)
+      alert('Error al procesar la devolución. Por favor, intenta nuevamente.')
     }
   }
 
@@ -471,20 +480,54 @@ export default function PagosPage() {
                           </span>
                         </td>
                         <td style={{ padding: '12px 16px' }}>
-                          <button
-                            onClick={() => handleDevolver(pago.id)}
-                            style={{
-                              padding: '6px 12px',
-                              background: '#ef4444',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '6px',
-                              fontSize: '12px',
-                              cursor: 'pointer'
-                            }}
-                          >
-                            DEVOLVER
-                          </button>
+                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                            {pago.estado !== 'APROBADO' && (
+                              <button
+                                onClick={async () => {
+                                  if (!confirm('¿Marcar este pago como APROBADO?')) return
+                                  try {
+                                    await fetch(`/api/pagos/${pago.id}`, {
+                                      method: 'PUT',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ estado: 'APROBADO', fechaPago: new Date().toISOString() }),
+                                    })
+                                    await fetchPagos()
+                                    alert('Pago marcado como APROBADO')
+                                  } catch (error) {
+                                    console.error('Error actualizando pago:', error)
+                                    alert('Error al actualizar el pago')
+                                  }
+                                }}
+                                style={{
+                                  padding: '6px 12px',
+                                  background: '#10b981',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                APROBAR
+                              </button>
+                            )}
+                            {pago.estado === 'APROBADO' && (
+                              <button
+                                onClick={() => handleDevolver(pago.id)}
+                                style={{
+                                  padding: '6px 12px',
+                                  background: '#ef4444',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                DEVOLVER
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     )
