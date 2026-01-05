@@ -4,6 +4,7 @@ import ProductCards from "@/components/home/ProductCards";
 import ValuesSection from "@/components/home/ValuesSection";
 import ContactSection from "@/components/home/ContactSection";
 import MantenimientoScreen from "@/components/MantenimientoScreen";
+import Loader from "@/components/Loader";
 import { prisma } from "@/lib/prisma";
 
 async function getMantenimientoConfig() {
@@ -45,6 +46,7 @@ export default async function Home() {
 
   return (
     <>
+      <Loader />
       <PromoBanner />
       <HeroSection />
       <ProductCards />

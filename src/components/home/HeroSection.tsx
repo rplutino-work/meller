@@ -545,16 +545,24 @@ function MenuButton() {
                     CORTINAS
                   </h3>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0, textAlign: 'right' }}>
-                    {['BlackOut', 'SunScreen', 'Romanas', 'Orientales', 'Tradicionales', 'Eclipse', 'Bandas Verticales'].map((item, index) => (
+                    {[
+                      { name: 'BlackOut', href: '/cortinas/blackout' },
+                      { name: 'SunScreen', href: '/cortinas/sunscreen' },
+                      { name: 'Romanas', href: '/cortinas/romanas' },
+                      { name: 'Orientales', href: '/cortinas/orientales' },
+                      { name: 'Tradicionales', href: '/cortinas/tradicionales' },
+                      { name: 'Eclipse', href: '/cortinas/eclipse' },
+                      { name: 'Bandas Verticales', href: '/cortinas/bandas-verticales' }
+                    ].map((item, index) => (
                       <motion.li 
-                        key={item}
+                        key={item.name}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 + index * 0.05 }}
                         style={{ marginBottom: '12px' }}
                       >
                         <Link
-                          href={`/${item.toLowerCase().replace(' ', '-')}`}
+                          href={item.href}
                           onClick={() => setMobileMenuOpen(false)}
                           style={{
                             fontSize: '22px',
@@ -569,7 +577,7 @@ function MenuButton() {
                           onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
                           onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                         >
-                          {item}
+                          {item.name}
                         </Link>
                       </motion.li>
                     ))}
@@ -598,7 +606,7 @@ function MenuButton() {
                       style={{ marginBottom: '12px' }}
                     >
                       <Link
-                        href="/toldos"
+                        href="/toldos-cerramientos"
                         onClick={() => setMobileMenuOpen(false)}
                         style={{
                           fontSize: '22px',

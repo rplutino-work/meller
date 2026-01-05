@@ -4,18 +4,27 @@ import { MercadoPagoConfig, Preference } from 'mercadopago'
 const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN
 
 if (!accessToken) {
-  console.warn('⚠️ MERCADOPAGO_ACCESS_TOKEN no está configurado en las variables de entorno')
+  if (process.env.NODE_ENV === 'development') {
+    console.warn('⚠️ MERCADOPAGO_ACCESS_TOKEN no está configurado en las variables de entorno')
+  }
 }
 
 const client = new MercadoPagoConfig({
   accessToken: accessToken || '',
   options: {
-    timeout: 5000,
-    idempotencyKey: 'abc',
+    timeout: 10000, // Aumentado a 10s para producción
+    // idempotencyKey se genera por request cuando es necesario
   },
 })
 
 export const preference = new Preference(client)
+
+// Verificar si estamos en producción
+export function isProduction(): boolean {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL 
+    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+  return baseUrl.startsWith('https://') && !baseUrl.includes('localhost') && !baseUrl.includes('vercel.app')
+}
 
 // Función para generar un token único para la URL de pago
 export function generatePaymentToken(): string {
@@ -71,13 +80,16 @@ export async function createMercadoPagoPreference(data: {
       external_reference: data.token,
     }
     
-    // Solo agregar auto_return si la URL es HTTPS (producción)
-    if (baseUrl.startsWith('https://')) {
+    // Configuración para producción
+    const isProd = isProduction()
+    
+    // Auto-return solo en producción (HTTPS)
+    if (isProd) {
       preferenceData.auto_return = 'approved'
     }
     
-    // Solo agregar notification_url si la URL es HTTPS (producción)
-    if (baseUrl.startsWith('https://')) {
+    // Notification URL solo en producción (HTTPS)
+    if (isProd) {
       preferenceData.notification_url = `${baseUrl}/api/pagos/mercado-pago/webhook`
     }
     
@@ -86,15 +98,23 @@ export async function createMercadoPagoPreference(data: {
       throw new Error('back_urls.success es requerido')
     }
 
-    console.log('Creating preference with data:', JSON.stringify(preferenceData, null, 2))
+    // Logs solo en desarrollo
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Creating preference with data:', JSON.stringify(preferenceData, null, 2))
+    }
     
     const response = await preference.create({ body: preferenceData })
     
     // El SDK de Mercado Pago devuelve la respuesta en response o response.body
     const responseData = (response as any).body || response
     
-    // Log para debugging
-    console.log('Mercado Pago SDK response:', JSON.stringify(responseData, null, 2))
+    // Logs solo en desarrollo
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Mercado Pago SDK response:', JSON.stringify(responseData, null, 2))
+    } else {
+      // En producción, solo log básico
+      console.log(`Mercado Pago preference created: ${responseData.id}`)
+    }
     
     // Retornar la respuesta con la estructura correcta
     return {

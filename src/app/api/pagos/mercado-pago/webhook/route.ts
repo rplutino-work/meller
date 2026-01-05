@@ -13,7 +13,12 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
-    console.log('Webhook recibido:', JSON.stringify(body, null, 2))
+    // Logs detallados solo en desarrollo
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Webhook recibido:', JSON.stringify(body, null, 2))
+    } else {
+      console.log('Webhook recibido de Mercado Pago')
+    }
     
     // Mercado Pago puede enviar diferentes tipos de notificaciones
     // Tipo 1: { type: 'payment', data: { id: '...' } }
@@ -34,18 +39,24 @@ export async function POST(request: NextRequest) {
     }
 
     if (!paymentId) {
-      console.log('Webhook recibido sin payment ID válido:', body)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Webhook recibido sin payment ID válido:', body)
+      }
       // Retornar 200 para que Mercado Pago no reintente
       return NextResponse.json({ received: true, message: 'No payment ID found' })
     }
 
-    console.log(`Procesando webhook para payment ID: ${paymentId}`)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Procesando webhook para payment ID: ${paymentId}`)
+    }
 
     // Obtener información del pago desde Mercado Pago
     let paymentInfo
     try {
       paymentInfo = await payment.get({ id: paymentId })
-      console.log('Payment info obtenida:', JSON.stringify(paymentInfo, null, 2))
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Payment info obtenida:', JSON.stringify(paymentInfo, null, 2))
+      }
     } catch (error: any) {
       console.error('Error obteniendo payment info:', error.message)
       return NextResponse.json({ received: true, error: 'Error fetching payment' }, { status: 200 })
@@ -55,7 +66,11 @@ export async function POST(request: NextRequest) {
       const token = paymentInfo.external_reference
       const status = paymentInfo.status
 
-      console.log(`Actualizando pago ${token} con estado: ${status}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Actualizando pago ${token} con estado: ${status}`)
+      } else {
+        console.log(`Actualizando pago ${token.substring(0, 8)}... con estado: ${status}`)
+      }
 
       // Mapear estados de Mercado Pago a nuestros estados
       let estado = 'GENERADO'
@@ -77,7 +92,11 @@ export async function POST(request: NextRequest) {
           },
         })
 
-        console.log(`✅ Pago ${token} actualizado a estado: ${estado}`)
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`✅ Pago ${token} actualizado a estado: ${estado}`)
+        } else {
+          console.log(`✅ Pago actualizado: ${estado}`)
+        }
       } catch (dbError: any) {
         console.error('Error actualizando en BD:', dbError.message)
         // Continuar y retornar 200 para que Mercado Pago no reintente

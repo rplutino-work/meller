@@ -128,7 +128,7 @@ export default function ContactSection() {
 
       {/* Contact Form Section */}
       <section 
-        id="contacto" 
+        id="solicitar-visita" 
         className="form"
         style={{
           padding: '120px 0',

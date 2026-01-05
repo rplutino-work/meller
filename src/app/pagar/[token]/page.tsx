@@ -611,28 +611,6 @@ export default function PagarPage() {
                 Generando enlace de pago...
               </div>
             )}
-
-            {/* Nota sobre modo Sandbox - Solo en desarrollo */}
-            {typeof window !== 'undefined' && 
-             (window.location.hostname === 'localhost' || window.location.hostname.includes('vercel.app')) ? (
-              <div style={{
-                background: '#fef3c7',
-                border: '1px solid #fde68a',
-                borderRadius: '8px',
-                padding: '16px',
-                marginTop: '16px',
-                marginBottom: '16px'
-              }}>
-                <p style={{ color: '#92400e', margin: 0, fontSize: '13px', fontWeight: 500, marginBottom: '8px' }}>
-                  ⚠️ Modo de Prueba (Sandbox)
-                </p>
-                <p style={{ color: '#92400e', margin: 0, fontSize: '12px', lineHeight: '1.5' }}>
-                  <strong>Usa tarjetas de prueba:</strong> Visa: <strong>4509 9535 6623 3704</strong> | 
-                  Mastercard: <strong>5031 7557 3453 0604</strong><br/>
-                  CVV: cualquier 3 dígitos | Fecha: cualquier fecha futura | DNI: cualquier 8 dígitos
-                </p>
-              </div>
-            ) : null}
           </>
         ) : (
           <div style={{

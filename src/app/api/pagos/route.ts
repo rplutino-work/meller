@@ -88,13 +88,19 @@ export async function POST(request: NextRequest) {
             token,
           })
           
-          console.log('Mercado Pago preference response:', JSON.stringify(preference, null, 2))
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Mercado Pago preference response:', JSON.stringify(preference, null, 2))
+          }
           
           mercadoPagoId = preference.id || null
           mercadoPagoInitPoint = preference.init_point || null
           
-          console.log('Mercado Pago ID:', mercadoPagoId)
-          console.log('Mercado Pago Init Point:', mercadoPagoInitPoint)
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Mercado Pago ID:', mercadoPagoId)
+            console.log('Mercado Pago Init Point:', mercadoPagoInitPoint)
+          } else {
+            console.log(`Preferencia MP creada: ${mercadoPagoId}`)
+          }
         } catch (error: any) {
           console.error('Error creating Mercado Pago preference:', error)
           console.error('Error details:', error.message, error.response?.data || error.body)
@@ -117,7 +123,9 @@ export async function POST(request: NextRequest) {
           token,
         })
         
-        console.log('Prisma checkout config:', JSON.stringify(prismaCheckout, null, 2))
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Prisma checkout config:', JSON.stringify(prismaCheckout, null, 2))
+        }
         
         // Para Prisma QR, el paymentUrl es la URL interna de la página de pago
         // El QR se genera dinámicamente cuando el cliente accede a la página

@@ -348,7 +348,7 @@ main {
 }
 
 @media (max-width: 768px) {
-  .values-grid {
+.values-grid {
     grid-template-columns: 1fr;
     gap: 40px;
   }
@@ -475,102 +475,75 @@ main {
 }
 
 .effect-chico .product-figcaption {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 3em;
-  background-color: rgba(0, 0, 0, 0);
-  opacity: 1;
-  transition: all 0.35s;
-}
-
-.effect-chico .product-figcaption::before {
-  position: absolute;
-  inset: 30px;
-  border: 1px solid rgb(255, 255, 255);
-  content: "";
-  transform: scale(1.1);
-  opacity: 0;
-  transition: opacity 0.35s, transform 0.35s;
-}
-
-.effect-chico:hover .product-figcaption::before {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.effect-chico h2 {
-  font-size: 52px;
-  font-weight: 300;
-  color: #fff;
-  font-family: 'Oswald', sans-serif;
-  text-transform: uppercase;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-
-.effect-chico h2.xxlarge {
-  font-size: 52px;
-}
-
-.effect-chico.special-1 h2,
-.effect-chico.special-2 h2 {
-  font-size: 34px;
-}
-
-.effect-chico h2 span {
-  font-weight: 500;
-  font-family: 'Oswald', sans-serif;
-}
-
-.effect-chico a {
-  font-size: 0;
-  font-weight: 400;
-  color: #000;
-  text-decoration: none;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  z-index: 1000;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-}
-
-/* Special variants */
-.effect-chico.special-1 h2,
-.effect-chico.special-2 h2 {
-  font-size: 34px;
-}
-
-/* Responsive */
-@media (max-width: 991px) {
-  .effect-chico {
-    width: 50%;
-    margin: 0;
-  }
-}
-
-@media (max-width: 767px) {
-  .effect-chico {
-    width: 100%;
-    margin: 0;
-  }
   
-  .effect-chico h2.xxlarge {
-    font-size: 36px;
+}
+
+/* Responsive styles for landing pages */
+@media (max-width: 768px) {
+  /* Landing page sections */
+  section {
+    padding: 20px 15px !important;
+    margin-bottom: 30px !important;
   }
-  
-  .effect-chico.special-1 h2,
-  .effect-chico.special-2 h2 {
-    font-size: 28px;
+
+  /* Text sizes */
+  p {
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* Image grids */
+  [style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+  }
+
+  /* Section backgrounds */
+  [style*="background: '#f8f8f8'"],
+  [style*="background: \"#f8f8f8\""] {
+    padding: 20px 15px !important;
+  }
+
+  /* Headings in sections */
+  h1, h2, h3 {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+  }
+
+  h3 {
+    font-size: 22px !important;
+  }
+
+  /* Lists */
+  ul {
+    padding-left: 20px !important;
+  }
+
+  li {
+    font-size: 14px !important;
+    margin-bottom: 10px !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* Prevent text overflow */
+  * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Fix image containers */
+  [style*="paddingTop: '75%'"] {
+    padding-top: 75% !important;
+  }
+
+  /* Fix spacing issues */
+  br {
+    display: block !important;
+    content: "" !important;
+    margin-top: 0.5em !important;
   }
 }

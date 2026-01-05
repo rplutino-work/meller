@@ -3,13 +3,13 @@
 import Link from 'next/link'
 
 const cortinas = [
-  { name: 'BlackOut', href: '/cortinas/BlackOut' },
-  { name: 'SunScreen', href: '/cortinas/SunScreen' },
-  { name: 'Romanas', href: '/cortinas/Romanas' },
-  { name: 'Orientales', href: '/cortinas/Orientales' },
-  { name: 'Tradicionales', href: '/cortinas/Tradicionales' },
-  { name: 'Eclipse', href: '/cortinas/Eclipse' },
-  { name: 'Bandas Verticales', href: '/cortinas/Bandas-Verticales' },
+  { name: 'BlackOut', href: '/cortinas/blackout' },
+  { name: 'SunScreen', href: '/cortinas/sunscreen' },
+  { name: 'Romanas', href: '/cortinas/romanas' },
+  { name: 'Orientales', href: '/cortinas/orientales' },
+  { name: 'Tradicionales', href: '/cortinas/tradicionales' },
+  { name: 'Eclipse', href: '/cortinas/eclipse' },
+  { name: 'Bandas Verticales', href: '/cortinas/bandas-verticales' },
 ]
 
 const sillones = [
@@ -353,7 +353,7 @@ export default function Footer() {
                 }}
               >
                 <Link 
-                  href="/toldos-y-cerramientos"
+                  href="/toldos-cerramientos"
                   style={{
                     fontSize: '16px',
                     fontWeight: 400,
