@@ -76,7 +76,9 @@ export async function POST(request: NextRequest) {
       let estado = 'GENERADO'
       if (status === 'approved') {
         estado = 'APROBADO'
-      } else if (status === 'rejected' || status === 'cancelled' || status === 'refunded') {
+      } else if (status === 'refunded') {
+        estado = 'DEVUELTO'
+      } else if (status === 'rejected' || status === 'cancelled') {
         estado = 'RECHAZADO'
       }
 

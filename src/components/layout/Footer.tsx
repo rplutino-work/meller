@@ -12,11 +12,6 @@ const cortinas = [
   { name: 'Bandas Verticales', href: '/cortinas/bandas-verticales' },
 ]
 
-const sillones = [
-  { name: 'Tradicionales', href: '/sillones/Tradicionales' },
-  { name: 'Puff Movibles', href: '/sillones/Puff-Movibles' },
-  { name: 'Restauración', href: '/sillones/Restauracion' },
-]
 
 export default function Footer() {
   return (
@@ -274,7 +269,7 @@ export default function Footer() {
             </ul>
           </div>
           
-          {/* Right Column - Sillones */}
+          {/* Right Column - Toldos y Acciones */}
           <div 
             className="col-md-3"
             style={{
@@ -298,7 +293,7 @@ export default function Footer() {
               }}
             >
               <Link 
-                href="/sillones"
+                href="/toldos-cerramientos"
                 style={{
                   fontSize: '16px',
                   fontWeight: 400,
@@ -307,7 +302,7 @@ export default function Footer() {
                   fontFamily: 'Oswald, sans-serif'
                 }}
               >
-                Sillones
+                Toldos
               </Link>
             </h3>
             <ul 
@@ -318,63 +313,12 @@ export default function Footer() {
                 margin: '0 0 11px'
               }}
             >
-              {sillones.map((item, index) => (
-                <li 
-                  key={item.name} 
-                  style={{ 
-                    listStyle: 'none', 
-                    padding: 0, 
-                    margin: index === 2 ? '0 0 12px' : '0 0 5px' 
-                  }}
-                >
-                  <Link 
-                    href={item.href}
-                    style={{
-                      fontSize: '16px',
-                      color: 'rgb(128, 128, 128)',
-                      textDecoration: 'none',
-                      fontFamily: 'Oswald, sans-serif',
-                      transition: 'color 0.3s'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'rgb(128, 128, 128)'}
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-              
               <li 
                 className="norm"
                 style={{ 
                   listStyle: 'none', 
                   padding: 0, 
                   margin: '0 0 12px' 
-                }}
-              >
-                <Link 
-                  href="/toldos-cerramientos"
-                  style={{
-                    fontSize: '16px',
-                    fontWeight: 400,
-                    color: 'rgb(170, 170, 170)',
-                    textDecoration: 'none',
-                    fontFamily: 'Oswald, sans-serif',
-                    transition: 'color 0.3s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = 'rgb(170, 170, 170)'}
-                >
-                  Toldos y cerramientos
-                </Link>
-              </li>
-              
-              <li 
-                className="norm"
-                style={{ 
-                  listStyle: 'none', 
-                  padding: 0, 
-                  margin: '0 0 5px' 
                 }}
               >
                 <Link 

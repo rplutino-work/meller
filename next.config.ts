@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'www.meleroller.com.ar',
       },
+      {
+        protocol: 'https',
+        hostname: 'http2.mlstatic.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.mercadopago.com',
+      },
     ],
   },
 };

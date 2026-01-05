@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     const pagos = await prisma.pago.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { updatedAt: 'desc' }, // Cambiar a updatedAt para que los devueltos aparezcan primero
     })
 
     return NextResponse.json(pagos)

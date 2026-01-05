@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
 import { 
   Search, 
   Plus, 
@@ -44,19 +45,29 @@ const estadoLabels: Record<string, string> = {
   GENERADO: 'Generado',
   APROBADO: 'Aprobado',
   RECHAZADO: 'Rechazado',
+  DEVUELTO: 'Devuelto',
 }
 
 const estadoColors: Record<string, { bg: string; text: string }> = {
   GENERADO: { bg: '#fef3c7', text: '#92400e' },
   APROBADO: { bg: '#d1fae5', text: '#065f46' },
   RECHAZADO: { bg: '#fee2e2', text: '#991b1b' },
+  DEVUELTO: { bg: '#fef3c7', text: '#92400e' },
 }
 
 export default function PagosPage() {
   const [pagosPendientes, setPagosPendientes] = useState<Pago[]>([])
   const [pagosAprobados, setPagosAprobados] = useState<Pago[]>([])
+  const [pagosDevueltos, setPagosDevueltos] = useState<Pago[]>([])
+  const [pagosDevueltosEstado, setPagosDevueltosEstado] = useState<Pago[]>([])
+  const [allPagos, setAllPagos] = useState<Pago[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [filterEstado, setFilterEstado] = useState<string>('TODOS') // TODOS, GENERADO, APROBADO, RECHAZADO, DEVUELTO
+  const [solicitudesVisita, setSolicitudesVisita] = useState<any[]>([])
+  const [solicitudesPresupuesto, setSolicitudesPresupuesto] = useState<any[]>([])
+  const [showSolicitudesSelector, setShowSolicitudesSelector] = useState(false)
+  const [filterFecha, setFilterFecha] = useState<string>('TODOS') // TODOS, HOY, ULTIMOS_7, ULTIMOS_30
   const [modalOpen, setModalOpen] = useState(false)
   const [editingPago, setEditingPago] = useState<Pago | null>(null)
   const [isCreating, setIsCreating] = useState(false)
@@ -68,25 +79,55 @@ export default function PagosPage() {
     monto: '',
     maxCuotas: '1',
     estado: 'GENERADO',
-    proveedor: 'mercadopago', // 'mercadopago' o 'prisma'
+    proveedor: 'mercadopago', // Solo Mercado Pago disponible
     metodoPago: 'checkout', // 'checkout' o 'gateway'
   })
 
   useEffect(() => {
     fetchPagos()
+    fetchSolicitudes()
   }, [])
+
+  async function fetchSolicitudes() {
+    try {
+      const [visitasRes, presupuestosRes] = await Promise.all([
+        fetch('/api/solicitudes/visita'),
+        fetch('/api/solicitudes/presupuesto'),
+      ])
+      const visitas = await visitasRes.json()
+      const presupuestos = await presupuestosRes.json()
+      setSolicitudesVisita(visitas)
+      setSolicitudesPresupuesto(presupuestos)
+    } catch (error) {
+      console.error('Error fetching solicitudes:', error)
+    }
+  }
 
   async function fetchPagos() {
     try {
       setLoading(true)
-      const [pendientesRes, aprobadosRes] = await Promise.all([
+      const [pendientesRes, aprobadosRes, rechazadosRes, devueltosRes, allRes] = await Promise.all([
         fetch('/api/pagos?estado=GENERADO'),
         fetch('/api/pagos?ultimos30dias=true'),
+        fetch('/api/pagos?estado=RECHAZADO'),
+        fetch('/api/pagos?estado=DEVUELTO'),
+        fetch('/api/pagos'),
       ])
       const pendientes = await pendientesRes.json()
       const aprobados = await aprobadosRes.json()
+      const rechazados = await rechazadosRes.json()
+      const devueltos = await devueltosRes.json()
+      const all = await allRes.json()
       setPagosPendientes(pendientes)
       setPagosAprobados(aprobados)
+      // Solo mostrar pagos con estado DEVUELTO, y RECHAZADO que tengan mercadoPagoStatus === 'refunded' (por si hay alguno sin migrar)
+      const devueltosCompletos = [
+        ...devueltos,
+        ...rechazados.filter((p: Pago) => p.mercadoPagoStatus === 'refunded')
+      ]
+      setPagosDevueltos(devueltosCompletos)
+      setPagosDevueltosEstado(devueltos)
+      setAllPagos(all)
     } catch (error) {
       console.error('Error fetching pagos:', error)
     } finally {
@@ -194,7 +235,7 @@ export default function PagosPage() {
       
       if (response.ok) {
         alert('Pago devuelto exitosamente. El reembolso se procesará en Mercado Pago.')
-        await fetchPagos()
+      await fetchPagos()
       } else {
         alert(`Error al devolver el pago: ${result.error || result.details || 'Error desconocido'}`)
       }
@@ -220,15 +261,84 @@ export default function PagosPage() {
     return new Date(dateString).toLocaleDateString('es-AR')
   }
 
-  const filteredPendientes = pagosPendientes.filter(p =>
-    p.cliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (p.idPedido && p.idPedido.includes(searchTerm))
-  )
+  function getPlataformaId(pago: Pago): string {
+    if (pago.proveedor === 'mercadopago' && pago.mercadoPagoId) {
+      return pago.mercadoPagoId
+    }
+    if (pago.proveedor === 'prisma' && pago.prismaPaymentId) {
+      return pago.prismaPaymentId
+    }
+    return '-'
+  }
 
-  const filteredAprobados = pagosAprobados.filter(p =>
+  function getPlataformaInfo(pago: Pago): { nombre: string; logo: string | null; color: string } {
+    if (pago.proveedor === 'mercadopago') {
+      return {
+        nombre: 'Mercado Pago',
+        logo: '/images/logos/Mercado_Pago.png',
+        color: '#009EE3'
+      }
+    }
+    if (pago.proveedor === 'prisma') {
+      return {
+        nombre: 'Prisma',
+        logo: null,
+        color: '#6B7280'
+      }
+    }
+    return {
+      nombre: 'N/A',
+      logo: null,
+      color: '#6B7280'
+    }
+  }
+
+  // Función para filtrar pagos
+  const filterPagos = (pagos: Pago[]) => {
+    let filtered = pagos
+
+    // Filtro por búsqueda
+    if (searchTerm) {
+      filtered = filtered.filter(p =>
     p.cliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (p.idPedido && p.idPedido.includes(searchTerm))
-  )
+        (p.idPedido && p.idPedido.includes(searchTerm)) ||
+        (p.idCliente && p.idCliente.includes(searchTerm))
+      )
+    }
+
+    // Filtro por estado
+    if (filterEstado !== 'TODOS') {
+      if (filterEstado === 'DEVUELTO') {
+        // Para devueltos, incluir tanto DEVUELTO como RECHAZADO que fueron devueltos
+        filtered = filtered.filter(p => p.estado === 'DEVUELTO' || (p.estado === 'RECHAZADO' && p.mercadoPagoStatus === 'refunded'))
+      } else {
+        filtered = filtered.filter(p => p.estado === filterEstado)
+      }
+    }
+
+    // Filtro por fecha
+    if (filterFecha !== 'TODOS') {
+      const now = new Date()
+      const fechaLimite = new Date()
+      
+      if (filterFecha === 'HOY') {
+        fechaLimite.setHours(0, 0, 0, 0)
+        filtered = filtered.filter(p => new Date(p.createdAt) >= fechaLimite)
+      } else if (filterFecha === 'ULTIMOS_7') {
+        fechaLimite.setDate(fechaLimite.getDate() - 7)
+        filtered = filtered.filter(p => new Date(p.createdAt) >= fechaLimite)
+      } else if (filterFecha === 'ULTIMOS_30') {
+        fechaLimite.setDate(fechaLimite.getDate() - 30)
+        filtered = filtered.filter(p => new Date(p.createdAt) >= fechaLimite)
+      }
+    }
+
+    return filtered
+  }
+
+  const filteredPendientes = filterPagos(pagosPendientes)
+  const filteredAprobados = filterPagos(pagosAprobados)
+  const filteredDevueltos = filterPagos(pagosDevueltos)
 
   if (loading) {
     return (
@@ -282,18 +392,20 @@ export default function PagosPage() {
         </button>
       </div>
 
-      {/* Search */}
+      {/* Filtros */}
       <div style={{
         background: 'white',
         borderRadius: '12px',
         border: '1px solid #e2e8f0',
         padding: '16px'
       }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Búsqueda */}
         <div style={{ position: 'relative' }}>
           <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
           <input
             type="text"
-            placeholder="Buscar por cliente o pedido..."
+              placeholder="Buscar por cliente, pedido o ID cliente..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -306,6 +418,62 @@ export default function PagosPage() {
               fontFamily: 'inherit'
             }}
           />
+          </div>
+
+          {/* Filtros por estado y fecha */}
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: '200px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#64748b', marginBottom: '6px' }}>
+                Estado
+              </label>
+              <select
+                value={filterEstado}
+                onChange={(e) => setFilterEstado(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  fontFamily: 'inherit',
+                  background: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="TODOS">Todos los estados</option>
+                <option value="GENERADO">Generado</option>
+                <option value="APROBADO">Aprobado</option>
+                <option value="DEVUELTO">Devuelto</option>
+                <option value="RECHAZADO">Rechazado</option>
+              </select>
+            </div>
+            <div style={{ flex: 1, minWidth: '200px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#64748b', marginBottom: '6px' }}>
+                Fecha
+              </label>
+              <select
+                value={filterFecha}
+                onChange={(e) => setFilterFecha(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  fontFamily: 'inherit',
+                  background: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="TODOS">Todas las fechas</option>
+                <option value="HOY">Hoy</option>
+                <option value="ULTIMOS_7">Últimos 7 días</option>
+                <option value="ULTIMOS_30">Últimos 30 días</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -322,7 +490,8 @@ export default function PagosPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>ID</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>ID Plataforma</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Plataforma</th>
                   <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Cliente</th>
                   <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Pedido</th>
                   <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Monto</th>
@@ -335,7 +504,7 @@ export default function PagosPage() {
               <tbody>
                 {filteredPendientes.length === 0 ? (
                   <tr>
-                    <td colSpan={8} style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
+                    <td colSpan={9} style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
                       No hay pagos pendientes
                     </td>
                   </tr>
@@ -343,9 +512,32 @@ export default function PagosPage() {
                   filteredPendientes.map((pago) => {
                     const estadoStyle = estadoColors[pago.estado] || estadoColors.GENERADO
                     const paymentUrl = `${window.location.origin}/pagar/${pago.token}`
+                    const plataformaId = getPlataformaId(pago)
+                    const plataformaInfo = getPlataformaInfo(pago)
                     return (
                       <tr key={pago.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                        <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b' }}>{pago.id.slice(-4)}</td>
+                        <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b', fontFamily: 'monospace' }}>{plataformaId}</td>
+                        <td style={{ padding: '12px 16px' }}>
+                          {plataformaInfo.logo ? (
+                            <Image
+                              src={plataformaInfo.logo}
+                              alt={plataformaInfo.nombre}
+                              width={100}
+                              height={24}
+                              style={{ height: '24px', width: 'auto', objectFit: 'contain' }}
+                              unoptimized
+                            />
+                          ) : (
+                            <span style={{ 
+                              fontSize: '12px', 
+                              color: plataformaInfo.color || '#64748b', 
+                              fontWeight: 600,
+                              letterSpacing: '0.3px'
+                            }}>
+                              {plataformaInfo.nombre}
+                            </span>
+                          )}
+                        </td>
                         <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b' }}>{pago.cliente}</td>
                         <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b' }}>{pago.idPedido || '-'}</td>
                         <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b', fontWeight: 500 }}>{formatCurrency(pago.monto)}</td>
@@ -428,9 +620,89 @@ export default function PagosPage() {
         </div>
       </div>
 
+      {/* Pagos Devueltos */}
+      {filteredDevueltos.length > 0 && (
+        <div>
+          <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b', marginBottom: '16px' }}>Pagos Devueltos</h3>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            border: '1px solid #e2e8f0',
+            overflow: 'hidden'
+          }}>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>ID Plataforma</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Plataforma</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Cliente</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Pedido</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Monto</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Fecha Devolución</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredDevueltos.map((pago) => {
+                    // Si el pago fue devuelto (tiene mercadoPagoStatus === 'refunded'), mostrar como DEVUELTO
+                    const estadoReal = (pago.estado === 'RECHAZADO' && pago.mercadoPagoStatus === 'refunded') ? 'DEVUELTO' : pago.estado
+                    const estadoStyle = estadoColors[estadoReal] || estadoColors.DEVUELTO
+                    const plataformaId = getPlataformaId(pago)
+                    const plataformaInfo = getPlataformaInfo(pago)
+                    return (
+                      <tr key={pago.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b', fontFamily: 'monospace' }}>{plataformaId}</td>
+                        <td style={{ padding: '12px 16px' }}>
+                          {plataformaInfo.logo ? (
+                            <Image
+                              src={plataformaInfo.logo}
+                              alt={plataformaInfo.nombre}
+                              width={100}
+                              height={24}
+                              style={{ height: '24px', width: 'auto', objectFit: 'contain' }}
+                              unoptimized
+                            />
+                          ) : (
+                            <span style={{ 
+                              fontSize: '12px', 
+                              color: plataformaInfo.color || '#64748b', 
+                              fontWeight: 600,
+                              letterSpacing: '0.3px'
+                            }}>
+                              {plataformaInfo.nombre}
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b' }}>{pago.cliente}</td>
+                        <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b' }}>{pago.idPedido || '-'}</td>
+                        <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b', fontWeight: 500 }}>{formatCurrency(pago.monto)}</td>
+                        <td style={{ padding: '12px 16px', fontSize: '14px', color: '#64748b' }}>{formatDate(pago.updatedAt)}</td>
+                        <td style={{ padding: '12px 16px' }}>
+                          <span style={{
+                            padding: '4px 12px',
+                            borderRadius: '12px',
+                            fontSize: '12px',
+                            fontWeight: 500,
+                            background: estadoStyle.bg,
+                            color: estadoStyle.text
+                          }}>
+                            {estadoLabels[estadoReal] || estadoLabels[pago.estado]}
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Pagos Aprobados */}
       <div>
-        <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b', marginBottom: '16px' }}>Pagos Aprobados de los últimos 30 días</h3>
+        <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b', marginBottom: '16px' }}>Pagos Aprobados</h3>
         <div style={{
           background: 'white',
           borderRadius: '12px',
@@ -441,7 +713,8 @@ export default function PagosPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>ID</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>ID Plataforma</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Plataforma</th>
                   <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Cliente</th>
                   <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Pedido</th>
                   <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Monto</th>
@@ -453,16 +726,39 @@ export default function PagosPage() {
               <tbody>
                 {filteredAprobados.length === 0 ? (
                   <tr>
-                    <td colSpan={7} style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
-                      No hay pagos aprobados en los últimos 30 días
+                    <td colSpan={8} style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
+                      No hay pagos aprobados
                     </td>
                   </tr>
                 ) : (
                   filteredAprobados.map((pago) => {
                     const estadoStyle = estadoColors[pago.estado] || estadoColors.APROBADO
+                    const plataformaId = getPlataformaId(pago)
+                    const plataformaInfo = getPlataformaInfo(pago)
                     return (
                       <tr key={pago.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                        <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b' }}>{pago.id.slice(-4)}</td>
+                        <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b', fontFamily: 'monospace' }}>{plataformaId}</td>
+                        <td style={{ padding: '12px 16px' }}>
+                          {plataformaInfo.logo ? (
+                            <Image
+                              src={plataformaInfo.logo}
+                              alt={plataformaInfo.nombre}
+                              width={100}
+                              height={24}
+                              style={{ height: '24px', width: 'auto', objectFit: 'contain' }}
+                              unoptimized
+                            />
+                          ) : (
+                            <span style={{ 
+                              fontSize: '12px', 
+                              color: plataformaInfo.color || '#64748b', 
+                              fontWeight: 600,
+                              letterSpacing: '0.3px'
+                            }}>
+                              {plataformaInfo.nombre}
+                            </span>
+                          )}
+                        </td>
                         <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b' }}>{pago.cliente}</td>
                         <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b' }}>{pago.idPedido || '-'}</td>
                         <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b', fontWeight: 500 }}>{formatCurrency(pago.monto)}</td>
@@ -511,21 +807,21 @@ export default function PagosPage() {
                                 APROBAR
                               </button>
                             )}
-                            {pago.estado === 'APROBADO' && (
-                              <button
-                                onClick={() => handleDevolver(pago.id)}
-                                style={{
-                                  padding: '6px 12px',
-                                  background: '#ef4444',
-                                  color: 'white',
-                                  border: 'none',
-                                  borderRadius: '6px',
-                                  fontSize: '12px',
-                                  cursor: 'pointer'
-                                }}
-                              >
-                                DEVOLVER
-                              </button>
+                            {pago.estado === 'APROBADO' && pago.mercadoPagoId && (
+                          <button
+                            onClick={() => handleDevolver(pago.id)}
+                            style={{
+                              padding: '6px 12px',
+                              background: '#ef4444',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '6px',
+                              fontSize: '12px',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            DEVOLVER
+                          </button>
                             )}
                           </div>
                         </td>
@@ -680,69 +976,109 @@ export default function PagosPage() {
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151' }}>
                       ID Pedido
                     </label>
+                      <button
+                        type="button"
+                        onClick={() => setShowSolicitudesSelector(!showSolicitudesSelector)}
+                      style={{
+                          padding: '4px 8px',
+                          fontSize: '12px',
+                          background: showSolicitudesSelector ? '#3b82f6' : '#f1f5f9',
+                          color: showSolicitudesSelector ? 'white' : '#374151',
+                        border: '1px solid #e5e7eb',
+                          borderRadius: '6px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {showSolicitudesSelector ? 'Ocultar' : 'Asociar Solicitud'}
+                      </button>
+                  </div>
+                    {showSolicitudesSelector && (
+                      <div style={{ marginBottom: '8px', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                        <div style={{ marginBottom: '8px' }}>
+                          <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#64748b', marginBottom: '4px' }}>
+                            Solicitudes de Visita
+                    </label>
+                    <select
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                // Si el ID ya tiene formato VISITA-{numero}, usarlo directamente
+                                // Si no, agregar el prefijo (para IDs antiguos)
+                                const idPedido = e.target.value.startsWith('VISITA-') 
+                                  ? e.target.value 
+                                  : `VISITA-${e.target.value}`
+                                setFormData({ ...formData, idPedido })
+                                setShowSolicitudesSelector(false)
+                              }
+                            }}
+                      style={{
+                        width: '100%',
+                              padding: '8px 12px',
+                        border: '1px solid #e5e7eb',
+                              borderRadius: '6px',
+                              fontSize: '13px',
+                        background: 'white'
+                      }}
+                    >
+                            <option value="">Seleccionar visita...</option>
+                            {solicitudesVisita.map((s) => {
+                              // Extraer el número del ID si tiene formato VISITA-{numero}, sino mostrar el ID completo
+                              const displayId = s.id.startsWith('VISITA-') ? s.id : `VISITA-${s.id.slice(-4)}`
+                              return (
+                                <option key={s.id} value={s.id}>
+                                  {displayId} - {s.nombre} - {s.email} ({new Date(s.createdAt).toLocaleDateString('es-AR')})
+                                </option>
+                              )
+                            })}
+                    </select>
+                  </div>
+                      <div>
+                          <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#64748b', marginBottom: '4px' }}>
+                            Solicitudes de Presupuesto
+                        </label>
+                        <select
+                          onChange={(e) => {
+                              if (e.target.value) {
+                                // Si el ID ya tiene formato PRESUPUESTO-{numero}, usarlo directamente
+                                // Si no, agregar el prefijo (para IDs antiguos)
+                                const idPedido = e.target.value.startsWith('PRESUPUESTO-') 
+                                  ? e.target.value 
+                                  : `PRESUPUESTO-${e.target.value}`
+                                setFormData({ ...formData, idPedido })
+                                setShowSolicitudesSelector(false)
+                              }
+                            }}
+                            style={{
+                              width: '100%',
+                              padding: '8px 12px',
+                              border: '1px solid #e5e7eb',
+                              borderRadius: '6px',
+                              fontSize: '13px',
+                              background: 'white'
+                            }}
+                          >
+                            <option value="">Seleccionar presupuesto...</option>
+                            {solicitudesPresupuesto.map((s) => {
+                              // Extraer el número del ID si tiene formato PRESUPUESTO-{numero}, sino mostrar el ID completo
+                              const displayId = s.id.startsWith('PRESUPUESTO-') ? s.id : `PRESUPUESTO-${s.id.slice(-4)}`
+                              return (
+                                <option key={s.id} value={s.id}>
+                                  {displayId} - {s.nombre} - {s.email} ({new Date(s.createdAt).toLocaleDateString('es-AR')})
+                                </option>
+                              )
+                            })}
+                          </select>
+                        </div>
+                      </div>
+                    )}
                     <input
                       type="text"
                       value={formData.idPedido}
                       onChange={(e) => setFormData({ ...formData, idPedido: e.target.value })}
-                      style={{
-                        width: '100%',
-                        padding: '10px 14px',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        fontFamily: 'inherit'
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px' }}>
-                      Cantidad Máxima de Cuotas
-                    </label>
-                    <select
-                      value={formData.maxCuotas}
-                      onChange={(e) => setFormData({ ...formData, maxCuotas: e.target.value })}
-                      style={{
-                        width: '100%',
-                        padding: '10px 14px',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        fontFamily: 'inherit',
-                        background: 'white'
-                      }}
-                    >
-                      <option value="1">1</option>
-                      <option value="3">3</option>
-                      <option value="6">6</option>
-                      <option value="12">12</option>
-                      <option value="18">18</option>
-                    </select>
-                  </div>
-
-                  {isCreating && (
-                    <>
-                      {/* Selector de Proveedor */}
-                      <div>
-                        <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px' }}>
-                          Proveedor de Pago
-                        </label>
-                        <select
-                          value={formData.proveedor}
-                          onChange={(e) => {
-                            const newProveedor = e.target.value
-                            setFormData({ 
-                              ...formData, 
-                              proveedor: newProveedor,
-                              // Si es Prisma, usar QR por defecto. Si es Mercado Pago, usar checkout
-                              metodoPago: newProveedor === 'prisma' ? 'qr' : 'checkout'
-                            })
-                          }}
+                      placeholder="O ingresa manualmente"
                           style={{
                             width: '100%',
                             padding: '10px 14px',
@@ -750,22 +1086,40 @@ export default function PagosPage() {
                             borderRadius: '8px',
                             fontSize: '14px',
                             outline: 'none',
-                            fontFamily: 'inherit',
-                            background: 'white'
-                          }}
-                        >
-                          <option value="mercadopago">Mercado Pago</option>
-                          <option value="prisma">Prisma Medios de Pago (QR)</option>
-                        </select>
-                        <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
-                          {formData.proveedor === 'mercadopago' 
-                            ? 'Procesa pagos a través de Mercado Pago'
-                            : 'Procesa pagos mediante código QR con Prisma'}
-                        </p>
+                        fontFamily: 'inherit'
+                      }}
+                    />
                       </div>
 
-                      {/* Selector de Método - Solo para Mercado Pago */}
-                      {formData.proveedor === 'mercadopago' && (
+                        <div>
+                          <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px' }}>
+                      Cantidad Máxima de Cuotas
+                          </label>
+                          <select
+                      value={formData.maxCuotas}
+                      onChange={(e) => setFormData({ ...formData, maxCuotas: e.target.value })}
+                            style={{
+                              width: '100%',
+                              padding: '10px 14px',
+                              border: '1px solid #e5e7eb',
+                              borderRadius: '8px',
+                              fontSize: '14px',
+                              outline: 'none',
+                              fontFamily: 'inherit',
+                              background: 'white'
+                            }}
+                          >
+                      <option value="1">1</option>
+                      <option value="3">3</option>
+                      <option value="6">6</option>
+                      <option value="12">12</option>
+                      <option value="18">18</option>
+                          </select>
+                        </div>
+
+                  {isCreating && (
+                    <>
+                      {/* Selector de Método - Mercado Pago Checkout Pro */}
                         <div>
                           <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px' }}>
                             Método de Pago
@@ -784,65 +1138,12 @@ export default function PagosPage() {
                               background: 'white'
                             }}
                           >
-                            <option value="checkout">Checkout (Link de Pago)</option>
-                            <option value="gateway">Gateway (Pago Directo con Tarjeta)</option>
+                          <option value="checkout">Checkout Pro (Link de Pago)</option>
                           </select>
                           <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
-                            {formData.metodoPago === 'checkout' 
-                              ? 'Genera un link que el cliente puede usar para pagar'
-                              : 'Procesa el pago directamente con los datos de la tarjeta'}
+                          Genera un link que el cliente puede usar para pagar con Mercado Pago
                           </p>
                         </div>
-                      )}
-
-                      {/* Selector de Método para Prisma */}
-                      {formData.proveedor === 'prisma' && (
-                        <div>
-                          <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px' }}>
-                            Método de Pago
-                          </label>
-                          <select
-                            value={formData.metodoPago}
-                            onChange={(e) => setFormData({ ...formData, metodoPago: e.target.value })}
-                            style={{
-                              width: '100%',
-                              padding: '10px 14px',
-                              border: '1px solid #e5e7eb',
-                              borderRadius: '8px',
-                              fontSize: '14px',
-                              outline: 'none',
-                              fontFamily: 'inherit',
-                              background: 'white'
-                            }}
-                          >
-                            <option value="qr">🔲 Pago por QR (Recomendado)</option>
-                            <option value="checkout" disabled>💳 Pago con Tarjeta (No disponible)</option>
-                          </select>
-                          <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
-                            El cliente escanea el código QR con su app bancaria para pagar
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Info para Prisma QR */}
-                      {formData.proveedor === 'prisma' && formData.metodoPago === 'qr' && (
-                        <div style={{
-                          padding: '12px',
-                          background: '#f0f9ff',
-                          border: '1px solid #bae6fd',
-                          borderRadius: '8px',
-                          fontSize: '13px',
-                          color: '#0369a1'
-                        }}>
-                          <p style={{ margin: 0, fontWeight: 500, marginBottom: '4px' }}>
-                            🔲 Pago con QR
-                          </p>
-                          <p style={{ margin: 0 }}>
-                            Se generará un código QR que el cliente puede escanear con su app bancaria 
-                            (Mercado Pago, BNA+, Modo, etc.) para realizar el pago de forma instantánea.
-                          </p>
-                        </div>
-                      )}
                     </>
                   )}
 
@@ -867,6 +1168,7 @@ export default function PagosPage() {
                       >
                         <option value="GENERADO">Generado</option>
                         <option value="APROBADO">Aprobado</option>
+                        <option value="DEVUELTO">Devuelto</option>
                         <option value="RECHAZADO">Rechazado</option>
                       </select>
                     </div>

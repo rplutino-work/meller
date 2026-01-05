@@ -105,8 +105,8 @@ export default function Header() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-50 bg-white overflow-auto"
-              style={{ top: 0 }}
+              className="fixed inset-0 z-50 bg-white"
+              style={{ top: 0, overflow: 'hidden' }}
             >
               {/* Header dentro del menu */}
               <div className="border-b border-gray-100">
@@ -140,15 +140,15 @@ export default function Header() {
               </div>
 
               {/* Menu items */}
-              <div className="pt-12 pb-20 px-6 lg:px-10">
+              <div className="pt-8 pb-12 px-6 lg:px-10" style={{ maxHeight: 'calc(100vh - 80px)', overflow: 'hidden' }}>
                 <div className="max-w-[1400px] mx-auto">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
                     {/* Cortinas */}
                     <div>
-                      <h3 className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-8">
+                      <h3 className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-6">
                         Cortinas
                       </h3>
-                      <ul className="space-y-4">
+                      <ul className="space-y-2.5">
                         {navigation.map((item, index) => (
                           <motion.li 
                             key={item.name}
@@ -158,7 +158,7 @@ export default function Header() {
                           >
                             <Link
                               href={item.href}
-                              className="text-[28px] lg:text-[32px] font-serif font-light hover:text-gray-400 transition-colors leading-tight block"
+                              className="text-[26px] lg:text-[30px] font-serif font-light hover:text-gray-400 transition-colors leading-[1.2] block"
                               onClick={() => setMobileMenuOpen(false)}
                             >
                               {item.name}
@@ -170,7 +170,7 @@ export default function Header() {
 
                     {/* Toldos */}
                     <div>
-                      <h3 className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-8">
+                      <h3 className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-6">
                         Toldos
                       </h3>
                       <motion.div
@@ -180,7 +180,7 @@ export default function Header() {
                       >
                         <Link
                           href="/toldos-cerramientos"
-                          className="text-[28px] lg:text-[32px] font-serif font-light hover:text-gray-400 transition-colors leading-tight block"
+                          className="text-[26px] lg:text-[30px] font-serif font-light hover:text-gray-400 transition-colors leading-[1.2] block"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           Toldos
@@ -190,10 +190,10 @@ export default function Header() {
 
                     {/* Acciones */}
                     <div>
-                      <h3 className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-8">
+                      <h3 className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-6">
                         Solicitar
                       </h3>
-                      <ul className="space-y-4">
+                      <ul className="space-y-2.5">
                         {[
                           { name: 'Solicitar Visita', href: '/#solicitar-visita' },
                           { name: 'Cotizador', href: '/#cotizador' },
@@ -207,7 +207,7 @@ export default function Header() {
                           >
                             <Link
                               href={item.href}
-                              className="text-[28px] lg:text-[32px] font-serif font-light hover:text-gray-400 transition-colors leading-tight block"
+                              className="text-[26px] lg:text-[30px] font-serif font-light hover:text-gray-400 transition-colors leading-[1.2] block"
                               onClick={() => setMobileMenuOpen(false)}
                             >
                               {item.name}
@@ -219,16 +219,16 @@ export default function Header() {
 
                     {/* Contacto */}
                     <div>
-                      <h3 className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-8">
+                      <h3 className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-6">
                         Contacto
                       </h3>
                       <motion.div 
-                        className="space-y-4"
+                        className="space-y-3"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.55 }}
                       >
-                        <p className="text-[15px]">
+                        <p className="text-[14px] leading-snug">
                           <a href="tel:1175191273" className="hover:text-gray-400 transition-colors">
                             11 7519 1273
                           </a>
@@ -240,21 +240,21 @@ export default function Header() {
                         <p>
                           <a 
                             href="mailto:info@meleroller.com.ar" 
-                            className="text-[15px] hover:text-gray-400 transition-colors"
+                            className="text-[14px] hover:text-gray-400 transition-colors"
                           >
                             info@meleroller.com.ar
                           </a>
                         </p>
-                        <div className="pt-6">
-                          <p className="text-gray-400 text-[13px] leading-relaxed">
+                        <div className="pt-4">
+                          <p className="text-gray-400 text-[12px] leading-relaxed">
                             Presidente Juan Domingo Perón 1154<br />
                             Burzaco - Buenos Aires - Argentina
                           </p>
-                          <p className="text-gray-400 text-[13px] mt-4">
+                          <p className="text-gray-400 text-[12px] mt-3 leading-relaxed">
                             Lunes a Viernes de 8.00 a 12.00 hs.<br />
                             y de 13.30 a 17.00 hs.
                           </p>
-                          <p className="text-gray-400 text-[12px] mt-4 italic">
+                          <p className="text-gray-400 text-[11px] mt-3 italic leading-relaxed">
                             Visitas al Showroom con cita previa.
                           </p>
                         </div>

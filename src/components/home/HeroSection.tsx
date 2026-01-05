@@ -399,13 +399,14 @@ function MenuButton() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed bg-black overflow-auto"
+            className="fixed bg-black"
             style={{ 
               zIndex: 1030, 
               top: '45px',
               left: 0,
               right: 0,
-              bottom: 0
+              bottom: 0,
+              overflow: 'hidden'
             }}
           >
             {/* Contacto - top right */}
@@ -508,7 +509,7 @@ function MenuButton() {
               aria-label="Cerrar menu"
               style={{
                 position: 'absolute',
-                top: '60px',
+                top: '70px',
                 right: '60%',
                 color: '#fff',
                 fontSize: '48px',
@@ -528,19 +529,20 @@ function MenuButton() {
             </button>
 
             {/* Menu items - alineados a la izquierda */}
-            <div className="flex flex-col items-start justify-start" style={{ position: 'absolute', top: '105px', right: '60%', paddingBottom: '40px' }}>
+            <div className="flex flex-col items-start justify-start" style={{ position: 'absolute', top: '120px', right: '60%', paddingBottom: '30px' }}>
               <div style={{ width: '100%', maxWidth: '600px' }}>
                 {/* Cortinas */}
-                <div style={{ marginBottom: '35px' }}>
+                <div style={{ marginBottom: '30px' }}>
                   <h3 style={{
-                    fontSize: '52px',
+                    fontSize: '50px',
                     fontFamily: 'Oswald, sans-serif',
                     fontWeight: 300,
                     color: '#fff',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
-                    margin: '0 0 25px 0',
-                    textAlign: 'right'
+                    margin: '0 0 22px 0',
+                    textAlign: 'right',
+                    lineHeight: '1.1'
                   }}>
                     CORTINAS
                   </h3>
@@ -559,20 +561,21 @@ function MenuButton() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 + index * 0.05 }}
-                        style={{ marginBottom: '12px' }}
+                        style={{ marginBottom: '10px' }}
                       >
                         <Link
                           href={item.href}
                           onClick={() => setMobileMenuOpen(false)}
                           style={{
-                            fontSize: '22px',
+                            fontSize: '21px',
                             fontFamily: 'Oswald, sans-serif',
                             fontWeight: 300,
                             color: '#fff',
                             textDecoration: 'none',
                             display: 'block',
                             transition: 'opacity 0.3s',
-                            textAlign: 'right'
+                            textAlign: 'right',
+                            lineHeight: '1.4'
                           }}
                           onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
                           onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
@@ -587,14 +590,15 @@ function MenuButton() {
                 {/* Toldos */}
                 <div>
                   <h3 style={{
-                    fontSize: '52px',
+                    fontSize: '50px',
                     fontFamily: 'Oswald, sans-serif',
                     fontWeight: 300,
                     color: '#fff',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
-                    margin: '0 0 25px 0',
-                    textAlign: 'right'
+                    margin: '0 0 22px 0',
+                    textAlign: 'right',
+                    lineHeight: '1.1'
                   }}>
                     TOLDOS
                   </h3>
@@ -603,20 +607,21 @@ function MenuButton() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.45 }}
-                      style={{ marginBottom: '12px' }}
+                      style={{ marginBottom: '10px' }}
                     >
                       <Link
                         href="/toldos-cerramientos"
                         onClick={() => setMobileMenuOpen(false)}
                         style={{
-                          fontSize: '22px',
+                          fontSize: '21px',
                           fontFamily: 'Oswald, sans-serif',
                           fontWeight: 300,
                           color: '#fff',
                           textDecoration: 'none',
                           display: 'block',
                           transition: 'opacity 0.3s',
-                          textAlign: 'right'
+                          textAlign: 'right',
+                          lineHeight: '1.4'
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
                         onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}

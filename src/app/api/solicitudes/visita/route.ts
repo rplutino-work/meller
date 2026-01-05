@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { generateVisitaId } from '@/lib/solicitud-ids'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,8 +14,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Generar ID numérico secuencial
+    const id = await generateVisitaId()
+
     const solicitud = await prisma.solicitudVisita.create({
       data: {
+        id,
         nombre,
         email,
         telefono,

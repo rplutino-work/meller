@@ -31,10 +31,21 @@ export async function POST(
       )
     }
 
+    // Validar que el pago tenga mercadoPagoId si es de Mercado Pago
+    if (pago.proveedor === 'mercadopago' && !pago.mercadoPagoId) {
+      return NextResponse.json(
+        { error: 'Este pago no tiene un ID de Mercado Pago asociado. No se puede procesar el reembolso.' },
+        { status: 400 }
+      )
+    }
+
     // Si es un pago de Mercado Pago, hacer el reembolso
     if (pago.proveedor === 'mercadopago' && pago.mercadoPagoId) {
       try {
         const refundAmount = amount ? parseFloat(amount) : pago.monto
+        
+        // Generar un idempotency key único para evitar duplicados
+        const idempotencyKey = `${pago.id}-${Date.now()}-${Math.random().toString(36).substring(7)}`
         
         // Hacer el reembolso en Mercado Pago usando la API REST directamente
         const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN
@@ -45,6 +56,7 @@ export async function POST(
             headers: {
               'Authorization': `Bearer ${accessToken}`,
               'Content-Type': 'application/json',
+              'X-Idempotency-Key': idempotencyKey,
             },
             body: JSON.stringify({
               amount: refundAmount,
@@ -53,8 +65,22 @@ export async function POST(
         )
 
         if (!refundResponse.ok) {
-          const errorData = await refundResponse.json()
-          throw new Error(errorData.message || 'Error al procesar reembolso en Mercado Pago')
+          let errorMessage = 'Error al procesar reembolso en Mercado Pago'
+          try {
+            const errorData = await refundResponse.json()
+            errorMessage = errorData.message || errorData.error || errorMessage
+            // Si hay más detalles en el error, incluirlos
+            if (errorData.cause && Array.isArray(errorData.cause)) {
+              const causes = errorData.cause.map((c: any) => c.description || c.message).filter(Boolean)
+              if (causes.length > 0) {
+                errorMessage += ': ' + causes.join(', ')
+              }
+            }
+          } catch (e) {
+            // Si no se puede parsear el error, usar el status text
+            errorMessage = `Error ${refundResponse.status}: ${refundResponse.statusText}`
+          }
+          throw new Error(errorMessage)
         }
 
         const refund = await refundResponse.json()
@@ -63,7 +89,7 @@ export async function POST(
         await prisma.pago.update({
           where: { id },
           data: {
-            estado: 'RECHAZADO',
+            estado: 'DEVUELTO',
             mercadoPagoStatus: 'refunded',
             fechaPago: null,
           },

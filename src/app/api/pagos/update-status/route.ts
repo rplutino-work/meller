@@ -31,7 +31,9 @@ export async function POST(request: NextRequest) {
           let estado = 'GENERADO'
           if (paymentInfo.status === 'approved') {
             estado = 'APROBADO'
-          } else if (paymentInfo.status === 'rejected' || paymentInfo.status === 'cancelled' || paymentInfo.status === 'refunded') {
+          } else if (paymentInfo.status === 'refunded') {
+            estado = 'DEVUELTO'
+          } else if (paymentInfo.status === 'rejected' || paymentInfo.status === 'cancelled') {
             estado = 'RECHAZADO'
           }
 
