@@ -220,7 +220,7 @@ export default function ContactSection() {
                 </a>
                 {' • '}
                 <a 
-                  href="https://wa.me/541122729695?text=¡Hola!" 
+                  href="https://wa.me/5491122729695?text=¡Hola!" 
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{

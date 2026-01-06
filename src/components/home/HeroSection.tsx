@@ -329,7 +329,7 @@ export default function HeroSection() {
 
       {/* WhatsApp Button */}
       <a
-        href="https://wa.me/5491175191273?text=Hola, quiero más información sobre cortinas"
+        href="https://wa.me/5491122729695?text=Hola, quiero más información sobre cortinas"
         target="_blank"
         rel="noopener noreferrer"
         className="whatsapp-btn"
@@ -418,7 +418,7 @@ function MenuButton() {
               zIndex: 10
             }}>
               <a 
-                href="https://wa.me/541122729695" 
+                href="https://wa.me/5491122729695" 
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{

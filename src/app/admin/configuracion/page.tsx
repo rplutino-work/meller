@@ -11,6 +11,7 @@ const configuraciones = [
     description: 'Gestiona el hero, banners y personalización visual.',
     icon: Image,
     href: '/admin/configuracion/customizacion',
+    disabled: false,
   },
   {
     id: 'preheader',
@@ -18,6 +19,7 @@ const configuraciones = [
     description: 'Texto del preheader superior del sitio.',
     icon: FileText,
     href: '/admin/configuracion/preheader',
+    disabled: false,
   },
   {
     id: 'formularios',
@@ -25,6 +27,7 @@ const configuraciones = [
     description: 'Emails y mensajes de formularios.',
     icon: Mail,
     href: '/admin/configuracion/formularios',
+    disabled: true,
   },
   {
     id: 'notificaciones',
@@ -32,6 +35,7 @@ const configuraciones = [
     description: 'Alertas y notificaciones del sistema.',
     icon: Bell,
     href: '/admin/configuracion/notificaciones',
+    disabled: true,
   },
   {
     id: 'mantenimiento',
@@ -39,6 +43,7 @@ const configuraciones = [
     description: 'Activa o desactiva la pantalla de mantenimiento.',
     icon: Wrench,
     href: '/admin/configuracion/mantenimiento',
+    disabled: false,
   },
   {
     id: 'usuarios',
@@ -46,6 +51,7 @@ const configuraciones = [
     description: 'Gestiona usuarios y permisos del sistema (solo superadmin).',
     icon: Users,
     href: '/admin/configuracion/usuarios',
+    disabled: false,
   },
 ]
 
@@ -107,62 +113,87 @@ export default function ConfiguracionPage() {
           <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>Estilo tipo Shopify: tarjetas claras y concisas.</p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px', padding: '20px' }}>
-          {configuraciones.map((config, index) => (
-            <motion.div
-              key={config.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-            >
-              <Link href={config.href} style={{ textDecoration: 'none', display: 'block' }}>
-                <div style={{
-                  background: 'white',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0',
-                  padding: '20px',
-                  transition: 'all 0.2s ease',
-                  cursor: 'pointer',
-                  height: '100%'
-                }}
-                onMouseEnter={(e) => {
+          {configuraciones.map((config, index) => {
+            const isDisabled = config.disabled
+            const content = (
+              <div style={{
+                background: isDisabled ? '#f8fafc' : 'white',
+                borderRadius: '12px',
+                border: isDisabled ? '1px dashed #cbd5e1' : '1px solid #e2e8f0',
+                padding: '20px',
+                transition: isDisabled ? 'none' : 'all 0.2s ease',
+                cursor: isDisabled ? 'not-allowed' : 'pointer',
+                height: '100%',
+                opacity: isDisabled ? 0.6 : 1
+              }}
+              onMouseEnter={(e) => {
+                if (!isDisabled) {
                   e.currentTarget.style.borderColor = '#cbd5e1'
                   e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'
-                }}
-                onMouseLeave={(e) => {
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isDisabled) {
                   e.currentTarget.style.borderColor = '#e2e8f0'
                   e.currentTarget.style.boxShadow = 'none'
-                }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'start', gap: '12px' }}>
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '12px',
-                      background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                      flexShrink: 0
-                    }}>
-                      <config.icon size={22} />
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', gap: '8px', marginBottom: '8px' }}>
-                        <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#1e293b', margin: 0 }}>
-                          {config.title}
-                        </h3>
+                }
+              }}
+              >
+                <div style={{ display: 'flex', alignItems: 'start', gap: '12px' }}>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '12px',
+                    background: isDisabled ? '#e2e8f0' : 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: isDisabled ? '#94a3b8' : 'white',
+                    flexShrink: 0
+                  }}>
+                    <config.icon size={22} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', gap: '8px', marginBottom: '8px' }}>
+                      <h3 style={{ fontSize: '15px', fontWeight: 600, color: isDisabled ? '#94a3b8' : '#1e293b', margin: 0 }}>
+                        {config.title}
+                      </h3>
+                      {!isDisabled && (
                         <ChevronRight size={18} style={{ color: '#cbd5e1', flexShrink: 0, marginTop: '2px' }} />
-                      </div>
-                      <p style={{ fontSize: '13px', color: '#64748b', margin: 0, lineHeight: '1.5' }}>
-                        {config.description}
-                      </p>
+                      )}
                     </div>
+                    <p style={{ fontSize: '13px', color: isDisabled ? '#94a3b8' : '#64748b', margin: 0, lineHeight: '1.5' }}>
+                      {config.description}
+                    </p>
+                    {isDisabled && (
+                      <p style={{ fontSize: '11px', color: '#94a3b8', margin: '8px 0 0 0', fontStyle: 'italic' }}>
+                        Configuración incompleta - No disponible
+                      </p>
+                    )}
                   </div>
                 </div>
-              </Link>
-            </motion.div>
-          ))}
+              </div>
+            )
+
+            return (
+              <motion.div
+                key={config.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                {isDisabled ? (
+                  <div style={{ textDecoration: 'none', display: 'block' }}>
+                    {content}
+                  </div>
+                ) : (
+                  <Link href={config.href} style={{ textDecoration: 'none', display: 'block' }}>
+                    {content}
+                  </Link>
+                )}
+              </motion.div>
+            )
+          })}
         </div>
       </div>
 

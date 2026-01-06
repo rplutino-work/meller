@@ -189,7 +189,7 @@ export default function MeasureModal({ isOpen, onClose }: MeasureModalProps) {
                   color: '#000'
                 }}>
                   <a
-                    href="https://wa.me/541122729695?text=Hola!"
+                    href="https://wa.me/5491122729695?text=Hola!"
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
