@@ -251,3 +251,50 @@ Para devolver un pago:
 5. El sistema procesará el reembolso en Mercado Pago
 6. El estado cambiará a **DEVUELTO**
 7. El cliente recibirá una notificación de Mercado Pago
+
+---
+
+## 📧 Configuración de Emails
+
+### Notificaciones Automáticas
+
+El sistema envía automáticamente emails de notificación cuando se reciben nuevas solicitudes de:
+- **Solicitud de Visita**
+- **Solicitud de Presupuesto**
+
+### Configuración de Destinatarios
+
+Los emails se envían a las direcciones configuradas en:
+**Admin → Configuración → Formularios**
+
+Cada formulario tiene su propia configuración:
+- **Email Destino:** Dirección que recibirá las notificaciones
+- **Asunto Email:** Asunto del correo
+- **Mensaje de Éxito:** Mensaje que verá el usuario al enviar el formulario
+
+### Configuración SMTP (Técnico)
+
+Para que los emails funcionen, el administrador del servidor debe configurar las variables de entorno SMTP:
+
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=tu-email@gmail.com
+SMTP_PASS=tu-contraseña-app
+SMTP_FROM=noreply@meleroller.com.ar
+```
+
+**Importante:** Si los emails no están llegando, verificar:
+1. Que las variables SMTP estén correctamente configuradas
+2. Que el email destino en la configuración de formularios sea válido
+3. Revisar los logs del servidor para ver errores de envío
+4. Verificar que el firewall no bloquee el puerto SMTP
+
+### Verificación de Emails
+
+Si los emails no llegan después de la migración:
+1. Verificar que las variables de entorno SMTP estén configuradas en el servidor de producción
+2. Verificar que los emails destino en `/admin/configuracion/formularios` sean correctos
+3. Revisar los logs del servidor para identificar errores
+4. Probar enviando una solicitud de prueba desde el sitio

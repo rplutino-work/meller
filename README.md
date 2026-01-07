@@ -20,6 +20,7 @@ npm install
 
 # Configurar variables de entorno
 cp .env.example .env
+# Editar .env y configurar las variables SMTP (ver sección de Email abajo)
 
 # Crear base de datos
 npx prisma migrate dev
@@ -38,6 +39,36 @@ URL: `http://localhost:3000/admin`
 **Credenciales de demo:**
 - Email: `admin@meleroller.com.ar`
 - Contraseña: `admin123`
+
+## 📧 Configuración de Email
+
+Para que los emails de notificación funcionen correctamente, es necesario configurar las variables de entorno SMTP en el archivo `.env`:
+
+```env
+# Configuración SMTP para envío de emails
+SMTP_HOST=smtp.gmail.com          # Servidor SMTP (Gmail, Outlook, etc.)
+SMTP_PORT=587                      # Puerto (587 para TLS, 465 para SSL)
+SMTP_SECURE=false                  # true para SSL (puerto 465), false para TLS (puerto 587)
+SMTP_USER=tu-email@gmail.com       # Email desde el cual se enviarán los correos
+SMTP_PASS=tu-contraseña-app        # Contraseña de aplicación o contraseña del email
+SMTP_FROM=noreply@meleroller.com.ar # Email remitente (opcional, usa SMTP_USER por defecto)
+```
+
+### Ejemplo para Gmail:
+1. Activar la verificación en 2 pasos en tu cuenta de Google
+2. Generar una "Contraseña de aplicación" desde [Google Account](https://myaccount.google.com/apppasswords)
+3. Usar esa contraseña en `SMTP_PASS`
+
+### Ejemplo para Outlook/Office 365:
+```env
+SMTP_HOST=smtp.office365.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=tu-email@outlook.com
+SMTP_PASS=tu-contraseña
+```
+
+**Nota:** Los emails se envían a las direcciones configuradas en el panel de administración (`/admin/configuracion/formularios`). Por defecto, se usa `info@meleroller.com.ar`.
 
 ## 📁 Estructura del Proyecto
 

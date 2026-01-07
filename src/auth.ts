@@ -38,7 +38,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role
+          role: user.role,
+          canManageVisitas: user.canManageVisitas,
+          canManagePresupuestos: user.canManagePresupuestos
         }
       }
     })
@@ -47,12 +49,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role
+        token.canManageVisitas = user.canManageVisitas
+        token.canManagePresupuestos = user.canManagePresupuestos
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.role = token.role as string
+        session.user.canManageVisitas = token.canManageVisitas as boolean
+        session.user.canManagePresupuestos = token.canManagePresupuestos as boolean
       }
       return session
     }

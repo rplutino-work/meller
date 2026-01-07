@@ -27,6 +27,8 @@ export async function GET(request: NextRequest) {
         email: true,
         name: true,
         role: true,
+        canManageVisitas: true,
+        canManagePresupuestos: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -62,7 +64,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { email, password, name, role } = body
+    const { email, password, name, role, canManageVisitas, canManagePresupuestos } = body
 
     if (!email || !password) {
       return NextResponse.json(
@@ -100,13 +102,17 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         name: name || null,
-        role: role || 'ADMIN'
+        role: role || 'ADMIN',
+        canManageVisitas: canManageVisitas !== undefined ? canManageVisitas : true,
+        canManagePresupuestos: canManagePresupuestos !== undefined ? canManagePresupuestos : true,
       },
       select: {
         id: true,
         email: true,
         name: true,
         role: true,
+        canManageVisitas: true,
+        canManagePresupuestos: true,
         createdAt: true,
         updatedAt: true,
       }
@@ -121,4 +127,5 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
 

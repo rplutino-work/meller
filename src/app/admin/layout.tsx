@@ -22,11 +22,11 @@ import {
 } from 'lucide-react'
 
 const navigation = [
-  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-  { name: 'Solicitudes de Visita', href: '/admin/visitas', icon: CalendarCheck },
-  { name: 'Presupuestos', href: '/admin/presupuestos', icon: FileText },
-  { name: 'Pagos', href: '/admin/pagos', icon: CreditCard },
-  { name: 'Configuración', href: '/admin/configuracion', icon: Settings },
+  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, requiresPermission: null },
+  { name: 'Solicitudes de Visita', href: '/admin/visitas', icon: CalendarCheck, requiresPermission: 'canManageVisitas' },
+  { name: 'Presupuestos', href: '/admin/presupuestos', icon: FileText, requiresPermission: 'canManagePresupuestos' },
+  { name: 'Pagos', href: '/admin/pagos', icon: CreditCard, requiresPermission: null },
+  { name: 'Configuración', href: '/admin/configuracion', icon: Settings, requiresPermission: null },
 ]
 
 function AdminLayoutContent({
@@ -215,32 +215,42 @@ function AdminLayoutContent({
               Menú Principal
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              {navigation.map((item) => {
-                const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    onClick={() => setSidebarOpen(false)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      padding: '10px 12px',
-                      borderRadius: '8px',
-                      textDecoration: 'none',
-                      color: isActive ? 'white' : '#cbd5e1',
-                      background: isActive ? 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)' : 'transparent',
-                      boxShadow: isActive ? '0 4px 12px rgba(59, 130, 246, 0.4)' : 'none',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <item.icon size={20} strokeWidth={1.5} />
-                    <span style={{ fontWeight: 500, fontSize: '14px', flex: 1 }}>{item.name}</span>
-                    {isActive && <ChevronRight size={16} />}
-                  </Link>
-                )
-              })}
+              {navigation
+                .filter((item) => {
+                  // Si no requiere permiso, siempre mostrar
+                  if (!item.requiresPermission) return true
+                  // Si requiere permiso, verificar que el usuario lo tenga
+                  // SUPERADMIN siempre tiene todos los permisos
+                  if (session?.user?.role === 'SUPERADMIN') return true
+                  // Verificar el permiso específico
+                  return session?.user?.[item.requiresPermission as 'canManageVisitas' | 'canManagePresupuestos'] === true
+                })
+                .map((item) => {
+                  const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '10px 12px',
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        color: isActive ? 'white' : '#cbd5e1',
+                        background: isActive ? 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)' : 'transparent',
+                        boxShadow: isActive ? '0 4px 12px rgba(59, 130, 246, 0.4)' : 'none',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <item.icon size={20} strokeWidth={1.5} />
+                      <span style={{ fontWeight: 500, fontSize: '14px', flex: 1 }}>{item.name}</span>
+                      {isActive && <ChevronRight size={16} />}
+                    </Link>
+                  )
+                })}
             </div>
           </nav>
 

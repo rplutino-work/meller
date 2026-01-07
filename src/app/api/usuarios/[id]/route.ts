@@ -31,6 +31,8 @@ export async function GET(
         email: true,
         name: true,
         role: true,
+        canManageVisitas: true,
+        canManagePresupuestos: true,
         createdAt: true,
         updatedAt: true,
       }
@@ -72,7 +74,7 @@ export async function PUT(
 
     const { id } = await params
     const body = await request.json()
-    const { email, password, name, role } = body
+    const { email, password, name, role, canManageVisitas, canManagePresupuestos } = body
 
     // Validar rol si se proporciona
     if (role && !['SUPERADMIN', 'ADMIN'].includes(role)) {
@@ -100,6 +102,8 @@ export async function PUT(
     
     if (name !== undefined) updateData.name = name
     if (role !== undefined) updateData.role = role
+    if (canManageVisitas !== undefined) updateData.canManageVisitas = canManageVisitas
+    if (canManagePresupuestos !== undefined) updateData.canManagePresupuestos = canManagePresupuestos
     if (password) {
       updateData.password = await bcrypt.hash(password, 10)
     }
@@ -112,6 +116,8 @@ export async function PUT(
         email: true,
         name: true,
         role: true,
+        canManageVisitas: true,
+        canManagePresupuestos: true,
         createdAt: true,
         updatedAt: true,
       }
@@ -170,4 +176,5 @@ export async function DELETE(
     )
   }
 }
+
 

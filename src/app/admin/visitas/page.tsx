@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { 
   Search, 
   Filter, 
@@ -18,7 +21,9 @@ import {
   CheckCircle2,
   AlertCircle,
   MoreVertical,
-  Edit
+  Edit,
+  ArrowLeft,
+  Shield
 } from 'lucide-react'
 
 interface SolicitudVisita {
@@ -59,6 +64,8 @@ const estadoColors: Record<string, { bg: string; text: string; border: string }>
 }
 
 export default function VisitasPage() {
+  const { data: session } = useSession()
+  const router = useRouter()
   const [solicitudes, setSolicitudes] = useState<SolicitudVisita[]>([])
   const [filteredSolicitudes, setFilteredSolicitudes] = useState<SolicitudVisita[]>([])
   const [loading, setLoading] = useState(true)
@@ -68,9 +75,18 @@ export default function VisitasPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
 
+  // Verificar permisos
+  const hasPermission = session?.user?.role === 'SUPERADMIN' || session?.user?.canManageVisitas === true
+
   useEffect(() => {
-    fetchSolicitudes()
-  }, [])
+    if (session && !hasPermission) {
+      setLoading(false)
+      return
+    }
+    if (session) {
+      fetchSolicitudes()
+    }
+  }, [session, hasPermission])
 
   useEffect(() => {
     let filtered = solicitudes
@@ -149,6 +165,57 @@ export default function VisitasPage() {
     a.href = url
     a.download = `solicitudes-visita-${new Date().toISOString().split('T')[0]}.csv`
     a.click()
+  }
+
+  if (!hasPermission && !loading) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <Link
+            href="/admin"
+            style={{
+              padding: '8px',
+              borderRadius: '8px',
+              background: 'transparent',
+              border: 'none',
+              color: '#64748b',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <ArrowLeft size={20} />
+          </Link>
+          <div>
+            <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1e293b', margin: 0 }}>Solicitudes de Visita</h1>
+            <p style={{ color: '#64748b', marginTop: '4px', fontSize: '14px' }}>
+              Gestión de solicitudes de visitas
+            </p>
+          </div>
+        </div>
+
+        <div style={{
+          background: '#fef3c7',
+          border: '1px solid #fde68a',
+          borderRadius: '12px',
+          padding: '24px',
+          display: 'flex',
+          alignItems: 'start',
+          gap: '12px'
+        }}>
+          <Shield size={24} style={{ color: '#92400e', flexShrink: 0 }} />
+          <div>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#92400e', margin: '0 0 8px 0' }}>
+              Acceso Restringido
+            </h3>
+            <p style={{ fontSize: '14px', color: '#78350f', margin: 0, lineHeight: '1.6' }}>
+              No tienes permisos para gestionar solicitudes de visita. Si necesitas acceso, contacta al administrador del sistema.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

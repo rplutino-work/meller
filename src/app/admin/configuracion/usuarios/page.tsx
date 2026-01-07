@@ -22,6 +22,8 @@ interface Usuario {
   email: string
   name: string | null
   role: string
+  canManageVisitas: boolean
+  canManagePresupuestos: boolean
   createdAt: string
   updatedAt: string
 }
@@ -39,7 +41,9 @@ export default function UsuariosPage() {
     email: '',
     password: '',
     name: '',
-    role: 'ADMIN'
+    role: 'ADMIN',
+    canManageVisitas: true,
+    canManagePresupuestos: true
   })
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
 
@@ -92,7 +96,9 @@ export default function UsuariosPage() {
       email: '',
       password: '',
       name: '',
-      role: 'ADMIN'
+      role: 'ADMIN',
+      canManageVisitas: true,
+      canManagePresupuestos: true
     })
     setModalOpen(true)
   }
@@ -104,7 +110,9 @@ export default function UsuariosPage() {
       email: usuario.email,
       password: '', // No mostrar contraseña
       name: usuario.name || '',
-      role: usuario.role
+      role: usuario.role,
+      canManageVisitas: usuario.canManageVisitas,
+      canManagePresupuestos: usuario.canManagePresupuestos
     })
     setModalOpen(true)
   }
@@ -138,7 +146,9 @@ export default function UsuariosPage() {
         const updateData: any = {
           email: formData.email,
           name: formData.name,
-          role: formData.role
+          role: formData.role,
+          canManageVisitas: formData.canManageVisitas,
+          canManagePresupuestos: formData.canManagePresupuestos
         }
         // Solo incluir password si se proporcionó
         if (formData.password) {
@@ -347,6 +357,7 @@ export default function UsuariosPage() {
               <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
                 <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Usuario</th>
                 <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Rol</th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Permisos</th>
                 <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Creado</th>
                 <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Acciones</th>
               </tr>
@@ -354,7 +365,7 @@ export default function UsuariosPage() {
             <tbody>
               {usuarios.length === 0 ? (
                 <tr>
-                  <td colSpan={4} style={{ textAlign: 'center', padding: '48px', color: '#64748b', fontSize: '14px' }}>
+                  <td colSpan={5} style={{ textAlign: 'center', padding: '48px', color: '#64748b', fontSize: '14px' }}>
                     No hay usuarios registrados
                   </td>
                 </tr>
@@ -389,6 +400,47 @@ export default function UsuariosPage() {
                           <RoleIcon size={14} />
                           {roleBadge.label}
                         </span>
+                      </td>
+                      <td style={{ padding: '12px 16px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          {usuario.canManageVisitas && (
+                            <span style={{
+                              display: 'inline-block',
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              fontSize: '11px',
+                              fontWeight: 500,
+                              background: '#dbeafe',
+                              color: '#1e40af',
+                              width: 'fit-content'
+                            }}>
+                              Visitas
+                            </span>
+                          )}
+                          {usuario.canManagePresupuestos && (
+                            <span style={{
+                              display: 'inline-block',
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              fontSize: '11px',
+                              fontWeight: 500,
+                              background: '#dcfce7',
+                              color: '#166534',
+                              width: 'fit-content'
+                            }}>
+                              Presupuestos
+                            </span>
+                          )}
+                          {!usuario.canManageVisitas && !usuario.canManagePresupuestos && (
+                            <span style={{
+                              fontSize: '12px',
+                              color: '#94a3b8',
+                              fontStyle: 'italic'
+                            }}>
+                              Sin permisos
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td style={{ padding: '12px 16px', fontSize: '14px', color: '#64748b' }}>
                         {new Date(usuario.createdAt).toLocaleDateString('es-AR', {
@@ -594,6 +646,76 @@ export default function UsuariosPage() {
                   </select>
                 </div>
 
+                <div style={{ 
+                  padding: '16px', 
+                  background: '#f9fafb', 
+                  borderRadius: '8px', 
+                  border: '1px solid #e5e7eb' 
+                }}>
+                  <label style={{ 
+                    display: 'block', 
+                    fontSize: '14px', 
+                    fontWeight: 600, 
+                    color: '#374151', 
+                    marginBottom: '12px' 
+                  }}>
+                    Permisos de Gestión
+                  </label>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <label style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '10px', 
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      color: '#374151'
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={formData.canManageVisitas}
+                        onChange={(e) => setFormData({ ...formData, canManageVisitas: e.target.checked })}
+                        style={{
+                          width: '18px',
+                          height: '18px',
+                          cursor: 'pointer',
+                          accentColor: '#10b981'
+                        }}
+                      />
+                      <span>Gestionar Solicitudes de Visita</span>
+                    </label>
+                    <label style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '10px', 
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      color: '#374151'
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={formData.canManagePresupuestos}
+                        onChange={(e) => setFormData({ ...formData, canManagePresupuestos: e.target.checked })}
+                        style={{
+                          width: '18px',
+                          height: '18px',
+                          cursor: 'pointer',
+                          accentColor: '#10b981'
+                        }}
+                      />
+                      <span>Gestionar Presupuestos</span>
+                    </label>
+                  </div>
+                  <p style={{ 
+                    fontSize: '12px', 
+                    color: '#6b7280', 
+                    marginTop: '12px', 
+                    marginBottom: 0,
+                    lineHeight: '1.5'
+                  }}>
+                    Selecciona qué secciones puede gestionar este usuario en el panel de administración.
+                  </p>
+                </div>
+
                 <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
                   <button
                     type="button"
@@ -660,4 +782,5 @@ export default function UsuariosPage() {
     </div>
   )
 }
+
 

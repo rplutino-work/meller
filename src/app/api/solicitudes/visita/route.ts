@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { generateVisitaId } from '@/lib/solicitud-ids'
+import { sendSolicitudEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,6 +29,22 @@ export async function POST(request: NextRequest) {
         mensaje: mensaje || '',
       },
     })
+
+    // Enviar email de notificación (no bloquea si falla)
+    try {
+      await sendSolicitudEmail('visita', {
+        id: solicitud.id,
+        nombre: solicitud.nombre,
+        email: solicitud.email,
+        telefono: solicitud.telefono,
+        direccion: solicitud.direccion,
+        localidad: solicitud.localidad,
+        mensaje: solicitud.mensaje,
+      })
+    } catch (emailError) {
+      console.error('Error enviando email (no crítico):', emailError)
+      // Continuar aunque falle el email
+    }
 
     return NextResponse.json({ success: true, data: solicitud })
   } catch (error: any) {
