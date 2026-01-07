@@ -40,6 +40,18 @@ function AdminLayoutContent({
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
 
+  // Debug: verificar permisos en la sesión
+  useEffect(() => {
+    if (session?.user) {
+      console.log('🔍 Sesión del usuario:', {
+        email: session.user.email,
+        role: session.user.role,
+        canManageVisitas: session.user.canManageVisitas,
+        canManagePresupuestos: session.user.canManagePresupuestos,
+      })
+    }
+  }, [session])
+
   useEffect(() => {
     const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024)
     checkDesktop()
@@ -215,17 +227,34 @@ function AdminLayoutContent({
               Menú Principal
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              {navigation
-                .filter((item) => {
-                  // Si no requiere permiso, siempre mostrar
-                  if (!item.requiresPermission) return true
-                  // Si requiere permiso, verificar que el usuario lo tenga
-                  // SUPERADMIN siempre tiene todos los permisos
-                  if (session?.user?.role === 'SUPERADMIN') return true
-                  // Verificar el permiso específico
-                  return session?.user?.[item.requiresPermission as 'canManageVisitas' | 'canManagePresupuestos'] === true
-                })
-                .map((item) => {
+              {(() => {
+                // Debug temporal
+                if (session?.user) {
+                  console.log('🔍 Debug navegación:', {
+                    role: session.user.role,
+                    isSuperAdmin: session.user.role === 'SUPERADMIN',
+                    canManageVisitas: session.user.canManageVisitas,
+                    canManagePresupuestos: session.user.canManagePresupuestos,
+                    navigationItems: navigation.map(item => ({
+                      name: item.name,
+                      requiresPermission: item.requiresPermission,
+                      shouldShow: !item.requiresPermission || 
+                        session.user.role === 'SUPERADMIN' || 
+                        session.user[item.requiresPermission as 'canManageVisitas' | 'canManagePresupuestos'] === true
+                    }))
+                  })
+                }
+                return navigation
+                  .filter((item) => {
+                    // Si no requiere permiso, siempre mostrar
+                    if (!item.requiresPermission) return true
+                    // SUPERADMIN siempre tiene todos los permisos (incluso si están en false)
+                    if (session?.user?.role === 'SUPERADMIN') return true
+                    // Verificar el permiso específico
+                    const permission = item.requiresPermission as 'canManageVisitas' | 'canManagePresupuestos'
+                    return session?.user?.[permission] === true
+                  })
+                  .map((item) => {
                   const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
                   return (
                     <Link
@@ -250,7 +279,8 @@ function AdminLayoutContent({
                       {isActive && <ChevronRight size={16} />}
                     </Link>
                   )
-                })}
+                })
+              })()}
             </div>
           </nav>
 
