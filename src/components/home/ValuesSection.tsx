@@ -23,45 +23,9 @@ const values = [
 
 export default function ValuesSection() {
   return (
-    <section style={{
-      margin: '5em 0',
-      padding: 0,
-      backgroundColor: '#fff',
-      background: '#fff',
-      position: 'relative',
-      zIndex: 1,
-      width: '100%',
-      overflow: 'hidden'
-    }}>
-      <div style={{
-        width: '100%',
-        padding: '0 15px',
-        margin: '0 auto',
-        maxWidth: '1920px',
-        boxSizing: 'border-box',
-        backgroundColor: '#fff',
-        background: '#fff',
-        position: 'relative',
-        zIndex: 1,
-        display: 'flex',
-        justifyContent: 'center'
-      }}
-      className="container-fluid"
-      >
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          margin: '0 -15px',
-          padding: 0,
-          width: '100%',
-          boxSizing: 'border-box',
-          backgroundColor: '#fff',
-          background: '#fff',
-          position: 'relative',
-          zIndex: 1
-        }}
-        className="row"
-        >
+    <section className="py-12 lg:py-20 bg-white">
+      <div className="w-full px-4 lg:px-6 mx-auto max-w-[1920px]">
+        <div className="flex flex-col lg:flex-row lg:flex-wrap justify-center gap-6 lg:gap-8">
           {values.map((value, index) => (
             <motion.div
               key={value.title}
@@ -69,15 +33,7 @@ export default function ValuesSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.15 }}
-              style={{
-                flex: '0 0 33.333333%',
-                maxWidth: '33.333333%',
-                padding: '0 15px',
-                margin: 0,
-                boxSizing: 'border-box',
-                width: '100%'
-              }}
-              className="values-col"
+              className="w-full lg:w-[calc(33.333%-1.5rem)] lg:max-w-[610px]"
             >
               {/* Image - title is already in the image */}
               <Image
@@ -85,24 +41,14 @@ export default function ValuesSection() {
                 alt={value.title}
                 width={610}
                 height={365}
-                style={{
-                  width: '100%',
-                  maxWidth: '610px',
-                  height: 'auto',
-                  display: 'block',
-                  marginBottom: '0.5em'
-                }}
+                className="w-full h-auto block mb-2 mx-auto lg:mx-0"
+                style={{ maxWidth: '610px' }}
               />
               {/* Description text */}
-              <p style={{
-                fontSize: '20px',
-                fontWeight: 300,
-                color: '#000',
-                paddingLeft: '18px',
-                marginBottom: index < 2 ? '40px' : '0',
-                lineHeight: '28.57px',
-                fontFamily: 'Oswald, sans-serif'
-              }}>
+              <p 
+                className="text-center lg:text-left text-lg lg:text-xl font-light text-black leading-relaxed px-2 lg:px-0 lg:pl-4"
+                style={{ fontFamily: 'Oswald, sans-serif' }}
+              >
                 {value.description}
               </p>
             </motion.div>

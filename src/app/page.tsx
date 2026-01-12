@@ -5,13 +5,23 @@ import ValuesSection from "@/components/home/ValuesSection";
 import ContactSection from "@/components/home/ContactSection";
 import MantenimientoScreen from "@/components/MantenimientoScreen";
 import Loader from "@/components/Loader";
-import { prisma } from "@/lib/prisma";
 
 async function getMantenimientoConfig() {
+  // Skip database check in development if DB is unavailable
+  // or if there's a connection error
   try {
-    const config = await prisma.configuracion.findUnique({
+    const { prisma } = await import("@/lib/prisma");
+    
+    // Add a timeout to prevent hanging
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Database timeout')), 3000)
+    );
+    
+    const queryPromise = prisma.configuracion.findUnique({
       where: { clave: 'mantenimiento' },
     });
+    
+    const config = await Promise.race([queryPromise, timeoutPromise]) as { valor: string } | null;
     
     if (config && config.valor) {
       const parsed = JSON.parse(config.valor);
@@ -20,7 +30,8 @@ async function getMantenimientoConfig() {
     
     return null;
   } catch (error) {
-    console.error('Error fetching mantenimiento config:', error);
+    // Log error but don't block the page from rendering
+    console.warn('Database unavailable, skipping maintenance check:', error instanceof Error ? error.message : 'Unknown error');
     return null;
   }
 }

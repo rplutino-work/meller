@@ -169,11 +169,11 @@ export default function HeroSection() {
       {/* Navegación sticky que aparece al scrollear - full width */}
       <HeaderNav />
 
-      <div className="flex min-h-screen">
+      <div className="flex flex-col lg:flex-row lg:min-h-screen">
         {/* Left side - Content (50%) */}
         <div className="w-full lg:w-1/2 bg-white relative flex flex-col">
           {/* Header interno - NO sticky */}
-          <div className="bg-white" style={{ padding: '0px 3rem 0 2.3rem', border: 'none' }}>
+          <div className="bg-white header-nav-container" style={{ border: 'none' }}>
             <div className="flex items-center justify-between h-[78px]">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-4">
@@ -199,17 +199,17 @@ export default function HeroSection() {
           </div>
 
           {/* Content */}
-          <div className="flex flex-col flex-1" style={{ padding: '0 3rem', paddingBottom: '2.5rem', justifyContent: 'space-around' }}>
-            <div className="pt-6">
+          <div className="flex flex-col lg:flex-1 px-4 lg:px-12 pb-4 lg:pb-10 lg:justify-around">
+            <div className="pt-4 lg:pt-6">
               {/* Slide counter */}
-              <div className="flex items-center gap-4 text-[14px] font-light mb-8">
+              <div className="flex items-center gap-3 lg:gap-4 text-[11px] lg:text-[14px] font-light mb-8 lg:mb-8">
                 <span>{String(currentIndex + 1).padStart(2, '0')}</span>
-                <div className="w-[90px] h-[1px] bg-black" />
+                <div className="w-[40px] lg:w-[90px] h-[1px] bg-black" />
                 <span>{String(projects.length).padStart(2, '0')}</span>
               </div>
 
               {/* FOTOS button */}
-              <button className="mb-8 text-[11px] uppercase tracking-[0.25em] text-gray-400 hover:text-black transition-colors font-light">
+              <button className="mb-10 lg:mb-8 text-[9px] lg:text-[11px] uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors font-light">
                 FOTOS
               </button>
 
@@ -222,35 +222,58 @@ export default function HeroSection() {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5 }}
                 >
-                  <h2 className="text-[80px] lg:text-[100px] xl:text-[120px] font-light leading-[0.85] mb-6 tracking-normal text-black">
+                  <h2 className="text-[38px] sm:text-[48px] lg:text-[100px] xl:text-[120px] font-light leading-[0.95] mb-6 lg:mb-6 tracking-normal text-black">
                     {currentProject.title === 'Depto. Boom' ? (
                       <>Depto.Boom</>
                     ) : currentProject.title}
                   </h2>
-<p className="text-[15px] font-light text-gray-600 max-w-[440px] leading-[1.65]" style={{ marginTop: '40px' }}>
+                  <p className="text-[12px] lg:text-[15px] font-light text-gray-600 max-w-[440px] leading-[1.5] lg:mt-10">
                       {currentProject.subtitle}
                     </p>
                 </motion.div>
               </AnimatePresence>
-            </div>
 
-            {/* Navigation arrows */}
-            <div className="flex gap-3" style={{ paddingBottom: '80px' }}>
+              {/* Navigation arrows - dentro del mismo bloque */}
+              <div className="flex gap-2 mt-10 lg:mt-auto lg:pb-20">
               <button
                 onClick={prevSlide}
-                className="w-[52px] h-[52px] rounded-full border border-gray-300 flex items-center justify-center hover:border-black hover:bg-black hover:text-white transition-all"
+                  className="w-[44px] h-[44px] lg:w-[52px] lg:h-[52px] rounded-full border border-gray-300 flex items-center justify-center hover:border-black hover:bg-black hover:text-white transition-all"
                 aria-label="Previous"
               >
-                <ChevronUp size={18} strokeWidth={1.5} />
+                  <ChevronUp size={16} strokeWidth={1.5} />
               </button>
               <button
                 onClick={nextSlide}
-                className="w-[52px] h-[52px] rounded-full border border-gray-300 flex items-center justify-center hover:border-black hover:bg-black hover:text-white transition-all"
+                  className="w-[44px] h-[44px] lg:w-[52px] lg:h-[52px] rounded-full border border-gray-300 flex items-center justify-center hover:border-black hover:bg-black hover:text-white transition-all"
                 aria-label="Next"
               >
-                <ChevronDown size={18} strokeWidth={1.5} />
+                  <ChevronDown size={16} strokeWidth={1.5} />
               </button>
+              </div>
             </div>
+          </div>
+
+          {/* Mobile Image - Solo visible en mobile */}
+          <div className="block lg:hidden w-full">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`mobile-img-${currentIndex}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                className="relative w-full"
+                style={{ height: '280px' }}
+              >
+                <div 
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{ 
+                    backgroundImage: `url(${currentProject.image})`,
+                    backgroundColor: '#e5e5e5'
+                  }}
+                />
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
 
@@ -329,7 +352,7 @@ export default function HeroSection() {
 
       {/* WhatsApp Button */}
       <a
-        href="https://wa.me/5491122729695?text=Hola, quiero más información sobre cortinas"
+        href="https://wa.me/5491175191273?text=Hola, quiero más información sobre cortinas"
         target="_blank"
         rel="noopener noreferrer"
         className="whatsapp-btn"
@@ -399,154 +422,64 @@ function MenuButton() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed bg-black"
+            className="fixed bg-black overflow-auto"
             style={{ 
               zIndex: 1030, 
-              top: '45px',
+              top: 0,
               left: 0,
               right: 0,
-              bottom: 0,
-              overflow: 'hidden'
+              bottom: 0
             }}
           >
-            {/* Contacto - top right */}
-            <div style={{
-              position: 'absolute',
-              top: '60px',
-              right: '80px',
-              textAlign: 'right',
-              zIndex: 10
-            }}>
-              <a 
-                href="https://wa.me/5491122729695" 
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  fontSize: '16px',
-                  fontFamily: 'Oswald, sans-serif',
-                  fontWeight: 300,
-                  color: '#fff',
-                  textDecoration: 'none',
-                  display: 'block',
-                  marginBottom: '12px',
-                  transition: 'opacity 0.3s'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-              >
-                11 2272 9695
-              </a>
-              <a 
-                href="mailto:info@meleroller.com.ar" 
-                style={{
-                  fontSize: '16px',
-                  fontFamily: 'Oswald, sans-serif',
-                  fontWeight: 300,
-                  color: '#fff',
-                  textDecoration: 'none',
-                  display: 'block',
-                  marginBottom: '20px',
-                  transition: 'opacity 0.3s'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-              >
-                info@meleroller.com.ar
-              </a>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'flex-end' }}>
-                <a 
-                  href="https://www.facebook.com/meleroller" 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    border: '0.67px solid rgb(128, 128, 128)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    textDecoration: 'none',
-                    transition: 'background-color 0.3s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                  aria-label="Facebook"
+            {/* Header dentro del menú móvil */}
+            <div className="header-nav-container bg-black" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+              <div className="flex items-center justify-between h-[78px]">
+                {/* Logo */}
+                <Link href="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
+                  <div className="relative" style={{ height: '40px', minWidth: '120px' }}>
+                    <Image
+                      src="/images/logos/logo-horizontal.png"
+                      alt="MELE ROLLER"
+                      width={500}
+                      height={78}
+                      style={{ height: '100%', width: '100%', objectFit: 'cover', objectPosition: 'left center', filter: 'brightness(0) invert(1)' }}
+                      priority
+                      unoptimized
+                    />
+                  </div>
+                </Link>
+
+                {/* Close button */}
+                <button 
+                  className="flex flex-col gap-[5px] p-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-label="Cerrar menu"
                 >
-                  <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#fff' }}>f</span>
-                </a>
-                <a 
-                  href="https://www.instagram.com/meleroller" 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    border: '0.67px solid rgb(128, 128, 128)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    textDecoration: 'none',
-                    transition: 'background-color 0.3s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                  aria-label="Instagram"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: '#fff' }}>
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                  </svg>
-                </a>
+                  <span className="block h-[2px] w-[24px] bg-white rotate-45 translate-y-[8px]" />
+                  <span className="block h-[2px] w-[24px] bg-white opacity-0" />
+                  <span className="block h-[2px] w-[24px] bg-white -rotate-45 -translate-y-[8px]" />
+                </button>
               </div>
             </div>
 
-            {/* X button - arriba a la derecha, cerca del contacto */}
-            <button
-              onClick={() => setMobileMenuOpen(false)}
-              aria-label="Cerrar menu"
-              style={{
-                position: 'absolute',
-                top: '70px',
-                right: '60%',
-                color: '#fff',
-                fontSize: '48px',
-                fontFamily: 'Oswald, sans-serif',
-                fontWeight: 300,
-                lineHeight: '1',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                zIndex: 20
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-            >
-              ×
-            </button>
-
-            {/* Menu items - alineados a la izquierda */}
-            <div className="flex flex-col items-start justify-start" style={{ position: 'absolute', top: '120px', right: '60%', paddingBottom: '30px' }}>
-              <div style={{ width: '100%', maxWidth: '600px' }}>
+            {/* Menu items */}
+            <div className="header-nav-container" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+              <div style={{ width: '100%' }}>
                 {/* Cortinas */}
-                <div style={{ marginBottom: '30px' }}>
+                <div style={{ marginBottom: '35px' }}>
                   <h3 style={{
-                    fontSize: '50px',
+                    fontSize: '28px',
                     fontFamily: 'Oswald, sans-serif',
                     fontWeight: 300,
                     color: '#fff',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
-                    margin: '0 0 22px 0',
-                    textAlign: 'right',
-                    lineHeight: '1.1'
+                    margin: '0 0 20px 0',
+                    textAlign: 'left'
                   }}>
                     CORTINAS
                   </h3>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, textAlign: 'right' }}>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, textAlign: 'left' }}>
                     {[
                       { name: 'BlackOut', href: '/cortinas/blackout' },
                       { name: 'SunScreen', href: '/cortinas/sunscreen' },
@@ -567,15 +500,14 @@ function MenuButton() {
                           href={item.href}
                           onClick={() => setMobileMenuOpen(false)}
                           style={{
-                            fontSize: '21px',
+                            fontSize: '18px',
                             fontFamily: 'Oswald, sans-serif',
                             fontWeight: 300,
                             color: '#fff',
                             textDecoration: 'none',
                             display: 'block',
                             transition: 'opacity 0.3s',
-                            textAlign: 'right',
-                            lineHeight: '1.4'
+                            textAlign: 'left'
                           }}
                           onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
                           onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
@@ -590,19 +522,18 @@ function MenuButton() {
                 {/* Toldos */}
                 <div>
                   <h3 style={{
-                    fontSize: '50px',
+                    fontSize: '28px',
                     fontFamily: 'Oswald, sans-serif',
                     fontWeight: 300,
                     color: '#fff',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
-                    margin: '0 0 22px 0',
-                    textAlign: 'right',
-                    lineHeight: '1.1'
+                    margin: '0 0 20px 0',
+                    textAlign: 'left'
                   }}>
                     TOLDOS
                   </h3>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, textAlign: 'right' }}>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, textAlign: 'left' }}>
                     <motion.li
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -613,15 +544,14 @@ function MenuButton() {
                         href="/toldos-cerramientos"
                         onClick={() => setMobileMenuOpen(false)}
                         style={{
-                          fontSize: '21px',
+                          fontSize: '18px',
                           fontFamily: 'Oswald, sans-serif',
                           fontWeight: 300,
                           color: '#fff',
                           textDecoration: 'none',
                           display: 'block',
                           transition: 'opacity 0.3s',
-                          textAlign: 'right',
-                          lineHeight: '1.4'
+                          textAlign: 'left'
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
                         onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}

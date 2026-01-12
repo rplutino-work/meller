@@ -100,9 +100,9 @@ export default function ProductCards() {
     <>
       {/* Title Section - with animated letters */}
       <section style={{ margin: '5em 0' }}>
-        <div className="container-fluid" style={{ width: '100%', padding: '0 15px', margin: '0 auto', maxWidth: '100%' }}>
-          <div className="row" style={{ display: 'block', margin: '0 -15px', padding: 0, width: '100%', boxSizing: 'border-box' }}>
-            <div className="col-md-12 text-center" style={{ width: '100%', padding: '0 15px', margin: 0, boxSizing: 'border-box' }}>
+        <div className="container-fluid" style={{ width: '100%', padding: '0 15px', margin: '0 auto', maxWidth: '100%', display: 'flex', justifyContent: 'center' }}>
+          <div className="row" style={{ display: 'flex', justifyContent: 'center', margin: '0 -15px', padding: 0, width: '100%', boxSizing: 'border-box' }}>
+            <div className="col-md-12 text-center" style={{ width: '100%', padding: '0 15px', margin: 0, boxSizing: 'border-box', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <h3
                 id="titulo-animado"
                 ref={titleRef}
@@ -115,7 +115,9 @@ export default function ProductCards() {
                   color: '#000',
                   textAlign: 'center',
                   display: 'inline-block',
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  width: 'auto',
+                  maxWidth: '100%'
                 }}
               >
                 {letters.map((letter, index) => (
