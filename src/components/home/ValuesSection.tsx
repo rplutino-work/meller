@@ -5,6 +5,11 @@ import Image from 'next/image'
 
 const values = [
   {
+    title: 'SERVICIO',
+    description: 'Hacemos envíos a todo el país. Nuestros decoradores profesionales realizan visitas sin cargo y entregan presupuestos en el acto.',
+    image: '/images/servicio-phone.jpg',
+  },
+  {
     title: 'VERSATILIDAD',
     description: 'Somos fábrica. Vendemos por mayor y menor. Brindamos atención especial a casas de decoración, arquitectos y constructoras.',
     image: '/images/versatilidad-phone.jpg',
@@ -14,16 +19,11 @@ const values = [
     description: 'Damos 3 años de garantía. Utilizamos sistemas nacionales e importados. Contamos con más de 50 diseños de telas.',
     image: '/images/calidad-phone.jpg',
   },
-  {
-    title: 'SERVICIO',
-    description: 'Hacemos envíos a todo el país. Nuestros decoradores profesionales realizan visitas sin cargo y entregan presupuestos en el acto.',
-    image: '/images/servicio-phone.jpg',
-  },
 ]
 
 export default function ValuesSection() {
   return (
-    <section className="py-12 lg:py-20 bg-white">
+    <section className="py-20 lg:py-32 bg-white values-section-padding">
       <div className="w-full px-4 lg:px-6 mx-auto max-w-[1920px]">
         <div className="flex flex-col lg:flex-row lg:flex-wrap justify-center gap-6 lg:gap-8">
           {values.map((value, index) => (

@@ -199,14 +199,22 @@ main {
   }
   
   /* Centrar formulario en mobile */
+  .form .container {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
   .form .row {
     align-items: center !important;
     display: flex !important;
     flex-direction: column !important;
+    justify-content: center !important;
   }
   
   .form .col-md-6,
-  .form .col-md-5 {
+  .form .col-md-5,
+  .form .col-md-offset-1 {
     text-align: center !important;
     display: flex !important;
     flex-direction: column !important;
@@ -214,6 +222,34 @@ main {
     width: 100% !important;
     max-width: 100% !important;
     flex: 0 0 100% !important;
+    margin-left: 0 !important;
+  }
+
+  /* Centrar inputs del formulario en mobile */
+  .form .input-field,
+  .form input,
+  .form textarea {
+    text-align: center !important;
+  }
+
+  /* Centrar contenido de las columnas del formulario */
+  .form .col-md-6 > *,
+  .form .col-md-5 > * {
+    text-align: center !important;
+  }
+
+  .form .col-md-6 h2,
+  .form .col-md-6 h3,
+  .form .col-md-6 p,
+  .form .col-md-5 h2,
+  .form .col-md-5 h3,
+  .form .col-md-5 p {
+    text-align: center !important;
+  }
+
+  .form .col-md-6 ul,
+  .form .col-md-5 ul {
+    justify-content: center !important;
   }
 }
 
@@ -552,6 +588,12 @@ main {
 }
 
 /* Mobile responsive for product cards */
+@media (min-width: 1024px) {
+  .values-section-padding {
+    padding: 3rem !important;
+  }
+}
+
 @media (max-width: 1023px) {
   .hero-content-wrapper {
     /* padding-left: 2rem !important; */
@@ -692,6 +734,11 @@ main {
   /* Lists */
   ul {
     padding-left: 20px !important;
+  }
+
+  /* Footer lists - sin padding para mantener centrado */
+  .footer ul {
+    padding-left: 0 !important;
   }
 
   li {
