@@ -199,17 +199,17 @@ export default function HeroSection() {
           </div>
 
           {/* Content */}
-          <div className="flex flex-col lg:flex-1 px-4 lg:px-12 pb-4 lg:pb-10 lg:justify-around">
+          <div className="flex flex-col lg:flex-1 hero-content-wrapper pb-4 lg:pb-10">
             <div className="pt-4 lg:pt-6">
               {/* Slide counter */}
-              <div className="flex items-center gap-3 lg:gap-4 text-[11px] lg:text-[14px] font-light mb-8 lg:mb-8">
+              <div className="flex items-center gap-3 lg:gap-4 text-[11px] lg:text-[14px] font-light mb-12 lg:mb-16">
                 <span>{String(currentIndex + 1).padStart(2, '0')}</span>
                 <div className="w-[40px] lg:w-[90px] h-[1px] bg-black" />
                 <span>{String(projects.length).padStart(2, '0')}</span>
               </div>
 
               {/* FOTOS button */}
-              <button className="mb-10 lg:mb-8 text-[9px] lg:text-[11px] uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors font-light">
+              <button className="mb-14 lg:mb-20 text-[9px] lg:text-[11px] uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors font-light">
                 FOTOS
               </button>
 
@@ -222,19 +222,19 @@ export default function HeroSection() {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5 }}
                 >
-                  <h2 className="text-[38px] sm:text-[48px] lg:text-[100px] xl:text-[120px] font-light leading-[0.95] mb-6 lg:mb-6 tracking-normal text-black">
+                  <h2 className="text-[38px] sm:text-[48px] lg:text-[100px] xl:text-[120px] font-light leading-[0.95] mb-10 lg:mb-16 tracking-normal text-black" style={{ padding: '2rem 0 0' }}>
                     {currentProject.title === 'Depto. Boom' ? (
                       <>Depto.Boom</>
                     ) : currentProject.title}
                   </h2>
-                  <p className="text-[12px] lg:text-[15px] font-light text-gray-600 max-w-[440px] leading-[1.5] lg:mt-10">
+                  <p className="text-[12px] lg:text-[15px] font-light text-gray-600 max-w-[440px] leading-[1.5] mt-8 lg:mt-10" style={{ padding: '2rem 0' }}>
                       {currentProject.subtitle}
                     </p>
                 </motion.div>
               </AnimatePresence>
 
               {/* Navigation arrows - dentro del mismo bloque */}
-              <div className="flex gap-2 mt-10 lg:mt-auto lg:pb-20">
+              <div className="flex gap-2 mt-10 lg:mt-auto lg:pb-20" style={{ padding: '0 0 1rem' }}>
               <button
                 onClick={prevSlide}
                   className="w-[44px] h-[44px] lg:w-[52px] lg:h-[52px] rounded-full border border-gray-300 flex items-center justify-center hover:border-black hover:bg-black hover:text-white transition-all"

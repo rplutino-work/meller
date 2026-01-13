@@ -542,10 +542,22 @@ main {
   .hero-content-inner {
     padding: 0 3rem;
   }
+  
+  .hero-content-wrapper {
+    padding-top: 3rem;
+    padding-left: 3.2rem !important;
+    padding-right: 3rem !important;
+    justify-content: flex-start;
+  }
 }
 
 /* Mobile responsive for product cards */
 @media (max-width: 1023px) {
+  .hero-content-wrapper {
+    /* padding-left: 2rem !important; */
+    /* padding-right: 2rem !important; */
+    padding: 2rem !important;
+  }
   #cortinas .grid {
     display: flex !important;
     flex-direction: column !important;
