@@ -170,8 +170,14 @@ export async function POST(request: NextRequest) {
             console.log(`Orden Getnet creada: ${getnetId}`)
           }
         } catch (error: any) {
-          console.error('Error creating Getnet checkout:', error)
-          console.error('Error details:', error.message)
+          console.error('❌ Error creating Getnet checkout:', error)
+          console.error('❌ Error details:', {
+            message: error.message,
+            stack: error.stack,
+            name: error.name,
+          })
+          // Continuar creando el pago incluso si falla el checkout,
+          // para que el usuario pueda ver el error y el admin pueda intentar crear el checkout manualmente
         }
       }
     }

@@ -216,12 +216,18 @@ export default function PagosPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('¿Estás seguro de eliminar este pago?')) return
+    if (!confirm('¿Estás seguro de eliminar este pago? Esta acción no se puede deshacer.')) return
     try {
-      await fetch(`/api/pagos/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/pagos/${id}`, { method: 'DELETE' })
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Error al eliminar el pago')
+      }
       await fetchPagos()
-    } catch (error) {
+      alert('Pago eliminado correctamente')
+    } catch (error: any) {
       console.error('Error deleting pago:', error)
+      alert(error.message || 'Error al eliminar el pago')
     }
   }
 
@@ -608,20 +614,43 @@ export default function PagosPage() {
                           </div>
                         </td>
                         <td style={{ padding: '12px 16px' }}>
-                          <button
-                            onClick={() => openEditModal(pago)}
-                            style={{
-                              padding: '6px 12px',
-                              background: '#10b981',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '6px',
-                              fontSize: '12px',
-                              cursor: 'pointer'
-                            }}
-                          >
-                            Editar
-                          </button>
+                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                            <button
+                              onClick={() => openEditModal(pago)}
+                              style={{
+                                padding: '6px 12px',
+                                background: '#10b981',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                fontSize: '12px',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              Editar
+                            </button>
+                            {(pago.estado === 'GENERADO' || pago.estado === 'RECHAZADO' || pago.estado === 'PENDIENTE') && (
+                              <button
+                                onClick={() => handleDelete(pago.id)}
+                                style={{
+                                  padding: '6px 12px',
+                                  background: '#fee2e2',
+                                  border: '1px solid #fecaca',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  cursor: 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  color: '#991b1b'
+                                }}
+                                title="Eliminar pago"
+                              >
+                                <Trash2 size={14} />
+                                Eliminar
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     )

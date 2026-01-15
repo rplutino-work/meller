@@ -43,6 +43,7 @@ export default function PagarPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null)
+  const [regenerating, setRegenerating] = useState(false)
 
   useEffect(() => {
     if (token) {
@@ -117,6 +118,13 @@ export default function PagarPage() {
         // Prisma - el pago se procesa en esta misma página con formulario
         // No hay URL externa, el formulario se renderiza directamente
         setPaymentUrl(null)
+      } else if (data.proveedor === 'getnet') {
+        // Getnet
+        if (data.getnetInitPoint) {
+          setPaymentUrl(data.getnetInitPoint)
+        } else if (data.getnetId) {
+          console.warn('Pago Getnet sin URL de pago')
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Error al cargar el pago')
@@ -419,7 +427,9 @@ export default function PagarPage() {
             Realizar Pago
           </h1>
           <p style={{ color: '#64748b' }}>
-            Completa el pago de forma segura con Mercado Pago
+            Completa el pago de forma segura{pago && (
+              <> con {pago.proveedor === 'mercadopago' ? 'Mercado Pago' : pago.proveedor === 'getnet' ? 'Getnet' : pago.proveedor === 'prisma' ? 'Prisma' : 'el proveedor seleccionado'}</>
+            )}
           </p>
         </div>
 
@@ -601,6 +611,61 @@ export default function PagarPage() {
                 onMouseLeave={(e) => e.currentTarget.style.background = '#009ee3'}
               >
                 Pagar con Mercado Pago
+              </a>
+            ) : (
+              <div style={{
+                padding: '16px',
+                background: '#f1f5f9',
+                borderRadius: '8px',
+                textAlign: 'center',
+                color: '#64748b',
+                fontSize: '14px'
+              }}>
+                Generando enlace de pago...
+              </div>
+            )}
+          </>
+        ) : pago.proveedor === 'getnet' ? (
+          // Getnet
+          <>
+            {!paymentUrl && !pago.getnetId && !pago.getnetInitPoint && pago.estado === 'GENERADO' ? (
+              <div style={{
+                padding: '20px',
+                background: '#fef3c7',
+                border: '1px solid #fde68a',
+                borderRadius: '8px',
+                textAlign: 'center',
+                color: '#92400e',
+                marginBottom: '16px'
+              }}>
+                <p style={{ margin: 0, fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>
+                  Generando enlace de pago...
+                </p>
+                <p style={{ margin: 0, fontSize: '13px' }}>
+                  Por favor espera mientras generamos tu enlace de pago seguro.
+                </p>
+              </div>
+            ) : paymentUrl ? (
+              <a
+                href={paymentUrl}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '16px',
+                  background: '#0066CC',
+                  color: 'white',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  textDecoration: 'none',
+                  fontWeight: 600,
+                  fontSize: '16px',
+                  marginBottom: '16px',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#0052A3'}
+                onMouseLeave={(e) => e.currentTarget.style.background = '#0066CC'}
+              >
+                Pagar con Getnet
               </a>
             ) : (
               <div style={{
