@@ -36,6 +36,9 @@ interface Pago {
   prismaPaymentId: string | null
   prismaInitPoint: string | null
   prismaStatus: string | null
+  getnetId: string | null
+  getnetInitPoint: string | null
+  getnetStatus: string | null
   fechaPago: string | null
   createdAt: string
   updatedAt: string
@@ -79,7 +82,7 @@ export default function PagosPage() {
     monto: '',
     maxCuotas: '1',
     estado: 'GENERADO',
-    proveedor: 'mercadopago', // Solo Mercado Pago disponible
+    proveedor: 'mercadopago', // mercadopago, prisma, getnet
     metodoPago: 'checkout', // 'checkout' o 'gateway'
   })
 
@@ -268,6 +271,9 @@ export default function PagosPage() {
     if (pago.proveedor === 'prisma' && pago.prismaPaymentId) {
       return pago.prismaPaymentId
     }
+    if (pago.proveedor === 'getnet' && pago.getnetId) {
+      return pago.getnetId
+    }
     return '-'
   }
 
@@ -284,6 +290,13 @@ export default function PagosPage() {
         nombre: 'Prisma',
         logo: null,
         color: '#6B7280'
+      }
+    }
+    if (pago.proveedor === 'getnet') {
+      return {
+        nombre: 'Getnet',
+        logo: null,
+        color: '#0066CC'
       }
     }
     return {
@@ -1119,7 +1132,31 @@ export default function PagosPage() {
 
                   {isCreating && (
                     <>
-                      {/* Selector de Método - Mercado Pago Checkout Pro */}
+                      {/* Selector de Proveedor */}
+                        <div>
+                          <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px' }}>
+                            Proveedor de Pago
+                          </label>
+                          <select
+                            value={formData.proveedor}
+                            onChange={(e) => setFormData({ ...formData, proveedor: e.target.value })}
+                            style={{
+                              width: '100%',
+                              padding: '10px 14px',
+                              border: '1px solid #e5e7eb',
+                              borderRadius: '8px',
+                              fontSize: '14px',
+                              outline: 'none',
+                              fontFamily: 'inherit',
+                              background: 'white'
+                            }}
+                          >
+                            <option value="mercadopago">Mercado Pago</option>
+                            <option value="prisma">Prisma</option>
+                            <option value="getnet">Getnet</option>
+                          </select>
+                        </div>
+                      {/* Selector de Método */}
                         <div>
                           <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px' }}>
                             Método de Pago
@@ -1138,10 +1175,10 @@ export default function PagosPage() {
                               background: 'white'
                             }}
                           >
-                          <option value="checkout">Checkout Pro (Link de Pago)</option>
+                            <option value="checkout">Checkout (Link de Pago)</option>
                           </select>
                           <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
-                          Genera un link que el cliente puede usar para pagar con Mercado Pago
+                            Genera un link que el cliente puede usar para pagar con {formData.proveedor === 'mercadopago' ? 'Mercado Pago' : formData.proveedor === 'prisma' ? 'Prisma' : 'Getnet'}
                           </p>
                         </div>
                     </>

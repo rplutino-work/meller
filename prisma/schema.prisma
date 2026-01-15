@@ -103,7 +103,7 @@ model Pago {
   token               String   @unique // Token único para la URL de pago
   
   // Proveedor de pago
-  proveedor           String   @default("mercadopago") // mercadopago, prisma
+  proveedor           String   @default("mercadopago") // mercadopago, prisma, getnet
   metodoPago          String?  // checkout, gateway, decidir
   
   // Mercado Pago
@@ -116,6 +116,12 @@ model Pago {
   prismaInitPoint     String?  // URL de pago de Prisma
   prismaStatus        String?  // Estado del pago en Prisma
   prismaTransactionId String?  // ID de transacción en Prisma
+  
+  // Getnet
+  getnetId            String?  // ID de la orden de pago en Getnet
+  getnetInitPoint     String?  // URL de pago de Getnet
+  getnetStatus        String?  // Estado del pago en Getnet
+  getnetTransactionId String?  // ID de transacción en Getnet
   
   fechaPago           DateTime? // Fecha cuando se aprobó el pago
   createdAt           DateTime @default(now())

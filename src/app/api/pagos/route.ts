@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { generatePaymentToken, createMercadoPagoPreference } from '@/lib/mercado-pago'
 import { createPrismaCheckout, isPrismaConfigured } from '@/lib/prisma-payments'
+import { createGetnetCheckout, isGetnetConfigured } from '@/lib/getnet'
 
 // GET - Obtener todos los pagos (para admin) o un pago por token
 export async function GET(request: NextRequest) {
@@ -71,6 +72,8 @@ export async function POST(request: NextRequest) {
     let mercadoPagoInitPoint: string | null = null
     let prismaPaymentId: string | null = null
     let prismaInitPoint: string | null = null
+    let getnetId: string | null = null
+    let getnetInitPoint: string | null = null
     
     const selectedProveedor = proveedor || 'mercadopago'
     const selectedMetodo = metodoPago || 'checkout'
@@ -136,6 +139,41 @@ export async function POST(request: NextRequest) {
       } catch (error: any) {
         console.error('Error creating Prisma checkout:', error)
       }
+    } else if (selectedProveedor === 'getnet') {
+      // GETNET
+      if (!isGetnetConfigured()) {
+        console.warn('Getnet no está configurado correctamente')
+      }
+      
+      if (selectedMetodo === 'checkout') {
+        // Método Checkout: crear orden y generar link
+        try {
+          const getnetCheckout = await createGetnetCheckout({
+            monto: parseFloat(monto),
+            cliente,
+            idPedido,
+            maxCuotas: parseInt(maxCuotas) || 1,
+            token,
+          })
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Getnet checkout response:', JSON.stringify(getnetCheckout, null, 2))
+          }
+          
+          getnetId = getnetCheckout.id || null
+          getnetInitPoint = getnetCheckout.init_point || null
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Getnet ID:', getnetId)
+            console.log('Getnet Init Point:', getnetInitPoint)
+          } else {
+            console.log(`Orden Getnet creada: ${getnetId}`)
+          }
+        } catch (error: any) {
+          console.error('Error creating Getnet checkout:', error)
+          console.error('Error details:', error.message)
+        }
+      }
     }
 
     // Crear pago en la base de datos
@@ -154,6 +192,8 @@ export async function POST(request: NextRequest) {
         mercadoPagoInitPoint,
         prismaPaymentId,
         prismaInitPoint,
+        getnetId,
+        getnetInitPoint,
       },
     })
 

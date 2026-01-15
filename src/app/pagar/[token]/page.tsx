@@ -24,6 +24,9 @@ interface Pago {
   prismaPaymentId: string | null
   prismaInitPoint: string | null
   prismaStatus: string | null
+  getnetId: string | null
+  getnetInitPoint: string | null
+  getnetStatus: string | null
   fechaPago: string | null
   createdAt: string
 }
