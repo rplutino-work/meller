@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { generateVisitaId } from '@/lib/solicitud-ids'
 import { sendSolicitudEmail } from '@/lib/email'
+import { getNextAsignado } from '@/lib/asignacion'
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,6 +19,9 @@ export async function POST(request: NextRequest) {
     // Generar ID numérico secuencial
     const id = await generateVisitaId()
 
+    // Asignación round-robin
+    const asignado = await getNextAsignado('visita')
+
     const solicitud = await prisma.solicitudVisita.create({
       data: {
         id,
@@ -27,6 +31,8 @@ export async function POST(request: NextRequest) {
         direccion: direccion || '',
         localidad: localidad || '',
         mensaje: mensaje || '',
+        asignadoA: asignado?.nombre || null,
+        asignadoUserId: asignado?.userId || null,
       },
     })
 

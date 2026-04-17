@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { FileText, Mail, Bell, ChevronRight, Settings, Palette, Globe, Sparkles, Image, Wrench, Users } from 'lucide-react'
+import { FileText, Mail, Bell, ChevronRight, Settings, Palette, Globe, Sparkles, Image, Wrench, Users, RefreshCw } from 'lucide-react'
 
 const configuraciones = [
   {
@@ -43,6 +43,14 @@ const configuraciones = [
     description: 'Activa o desactiva la pantalla de mantenimiento.',
     icon: Wrench,
     href: '/admin/configuracion/mantenimiento',
+    disabled: false,
+  },
+  {
+    id: 'asignacion',
+    title: 'Asignación de Consultas',
+    description: 'Configura la rotación automática de consultas entre el equipo.',
+    icon: RefreshCw,
+    href: '/admin/configuracion/asignacion',
     disabled: false,
   },
   {

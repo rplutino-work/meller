@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { 
-  Search, 
-  Eye, 
-  Trash2, 
+import {
+  Search,
+  Eye,
+  Trash2,
   X,
   FileText,
   Phone,
@@ -21,7 +21,8 @@ import {
   AlertCircle,
   MoreVertical,
   ArrowLeft,
-  Shield
+  Shield,
+  UserCheck
 } from 'lucide-react'
 
 interface Producto {
@@ -38,6 +39,8 @@ interface SolicitudPresupuesto {
   productos: string
   estado: string
   notas: string
+  asignadoA: string | null
+  asignadoUserId: string | null
   createdAt: string
   updatedAt: string
 }
@@ -66,6 +69,7 @@ export default function PresupuestosPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterEstado, setFilterEstado] = useState('')
+  const [filterAsignado, setFilterAsignado] = useState('')
   const [selectedSolicitud, setSelectedSolicitud] = useState<SolicitudPresupuesto | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -97,8 +101,12 @@ export default function PresupuestosPage() {
       filtered = filtered.filter(s => s.estado === filterEstado)
     }
 
+    if (filterAsignado) {
+      filtered = filtered.filter(s => s.asignadoA === filterAsignado)
+    }
+
     setFilteredSolicitudes(filtered)
-  }, [solicitudes, searchTerm, filterEstado])
+  }, [solicitudes, searchTerm, filterEstado, filterAsignado])
 
   async function fetchSolicitudes() {
     try {
@@ -149,7 +157,7 @@ export default function PresupuestosPage() {
   }
 
   function exportToCSV() {
-    const headers = ['Nombre', 'Email', 'Teléfono', 'Productos', 'Estado', 'Fecha']
+    const headers = ['Nombre', 'Email', 'Teléfono', 'Productos', 'Estado', 'Asignado a', 'Fecha']
     const rows = filteredSolicitudes.map(s => {
       const productos = parseProductos(s.productos)
       const productosStr = productos.map(p => `${p.tipo} (${p.ancho}x${p.alto}cm)`).join('; ')
@@ -159,6 +167,7 @@ export default function PresupuestosPage() {
         s.telefono,
         productosStr,
         s.estado,
+        s.asignadoA || 'Sin asignar',
         new Date(s.createdAt).toLocaleDateString('es-AR'),
       ]
     })
@@ -328,6 +337,33 @@ export default function PresupuestosPage() {
               ))}
             </select>
           </div>
+          <div style={{ position: 'relative' }}>
+            <select
+              value={filterAsignado}
+              onChange={(e) => setFilterAsignado(e.target.value)}
+              style={{
+                padding: '10px 40px 10px 14px',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '14px',
+                background: 'white',
+                cursor: 'pointer',
+                outline: 'none',
+                fontFamily: 'inherit',
+                minWidth: '180px',
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                backgroundPosition: 'right 10px center',
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: '20px'
+              }}
+            >
+              <option value="">Todos los asignados</option>
+              {[...new Set(solicitudes.map(s => s.asignadoA).filter(Boolean))].map(nombre => (
+                <option key={nombre} value={nombre!}>{nombre}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -425,6 +461,29 @@ export default function PresupuestosPage() {
                     <span>{productos.length} producto{productos.length !== 1 ? 's' : ''}</span>
                   </div>
                 </div>
+
+                {/* Asignado */}
+                {solicitud.asignadoA && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
+                    <div style={{
+                      width: '22px',
+                      height: '22px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
+                      fontSize: '10px',
+                      fontWeight: 600
+                    }}>
+                      {solicitud.asignadoA.charAt(0).toUpperCase()}
+                    </div>
+                    <span style={{ fontSize: '12px', color: '#7c3aed', fontWeight: 500 }}>
+                      {solicitud.asignadoA}
+                    </span>
+                  </div>
+                )}
 
                 {/* Footer */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
@@ -679,6 +738,24 @@ export default function PresupuestosPage() {
                       </div>
                     </div>
                   </div>
+
+                  {selectedSolicitud.asignadoA && (
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'start',
+                      gap: '12px',
+                      padding: '16px',
+                      background: '#f5f3ff',
+                      borderRadius: '12px',
+                      border: '1px solid #e9d5ff'
+                    }}>
+                      <UserCheck size={20} style={{ color: '#7c3aed', marginTop: '2px', flexShrink: 0 }} />
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: '11px', color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 4px 0' }}>Asignado a</p>
+                        <p style={{ fontWeight: 600, color: '#7c3aed', margin: 0, fontSize: '14px' }}>{selectedSolicitud.asignadoA}</p>
+                      </div>
+                    </div>
+                  )}
 
                   <div style={{
                     display: 'flex',
