@@ -16,6 +16,7 @@ model User {
   canManageVisitas    Boolean  @default(true) // Permiso para gestionar solicitudes de visita
   canManagePresupuestos Boolean @default(true) // Permiso para gestionar presupuestos
   recibeConsultas     Boolean  @default(false) // Participa en asignación round-robin
+  pesoAsignacion      Int      @default(1) // Cuántas consultas consecutivas recibe antes de pasar al siguiente
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
@@ -68,6 +69,7 @@ model AsignacionTurno {
   id              String   @id @default(cuid())
   tipoSolicitud   String   @unique // "visita", "presupuesto", "contacto"
   ultimoUsuarioId String?  // ID del último usuario asignado
+  contadorTurno   Int      @default(0) // Cuántas consultas lleva el usuario actual en su turno
   updatedAt       DateTime @updatedAt
 }
 

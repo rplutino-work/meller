@@ -17,7 +17,7 @@ export async function GET() {
 
     const usuarios = await prisma.user.findMany({
       where: { role: { not: 'SUPERADMIN' } },
-      select: { id: true, name: true, email: true, recibeConsultas: true },
+      select: { id: true, name: true, email: true, recibeConsultas: true, pesoAsignacion: true },
       orderBy: { name: 'asc' },
     })
 
@@ -44,7 +44,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { usuariosHabilitados } = body // Array of user IDs
+    const { usuariosHabilitados, pesos } = body // Array of user IDs + weight map
 
     if (!Array.isArray(usuariosHabilitados)) {
       return NextResponse.json({ error: 'usuariosHabilitados debe ser un array' }, { status: 400 })
@@ -63,9 +63,20 @@ export async function PUT(request: NextRequest) {
       })
     }
 
+    // Actualizar pesos si se enviaron
+    if (pesos && typeof pesos === 'object') {
+      for (const [userId, peso] of Object.entries(pesos)) {
+        const pesoNum = Math.max(1, Math.min(10, Number(peso) || 1))
+        await prisma.user.update({
+          where: { id: userId },
+          data: { pesoAsignacion: pesoNum },
+        })
+      }
+    }
+
     const updated = await prisma.user.findMany({
       where: { recibeConsultas: true },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true, email: true, pesoAsignacion: true },
     })
 
     return NextResponse.json({ success: true, habilitados: updated })

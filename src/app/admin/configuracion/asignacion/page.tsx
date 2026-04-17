@@ -18,11 +18,13 @@ interface Usuario {
   name: string | null
   email: string
   recibeConsultas: boolean
+  pesoAsignacion: number
 }
 
 interface Turno {
   tipoSolicitud: string
   ultimoUsuarioId: string | null
+  contadorTurno: number
 }
 
 export default function AsignacionPage() {
@@ -34,6 +36,7 @@ export default function AsignacionPage() {
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
   const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [pesos, setPesos] = useState<Record<string, number>>({})
 
   useEffect(() => {
     fetchConfig()
@@ -53,6 +56,9 @@ export default function AsignacionPage() {
       setUsuarios(data.usuarios)
       setTurnos(data.turnos)
       setSelectedIds(data.usuarios.filter((u: Usuario) => u.recibeConsultas).map((u: Usuario) => u.id))
+      const pesosMap: Record<string, number> = {}
+      data.usuarios.forEach((u: Usuario) => { pesosMap[u.id] = u.pesoAsignacion || 1 })
+      setPesos(pesosMap)
     } catch (err: any) {
       setError(err.message || 'Error al cargar')
     } finally {
@@ -64,6 +70,11 @@ export default function AsignacionPage() {
     setSelectedIds(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     )
+    setSuccess('')
+  }
+
+  function updatePeso(id: string, peso: number) {
+    setPesos(prev => ({ ...prev, [id]: Math.max(1, peso) }))
     setSuccess('')
   }
 
@@ -81,7 +92,7 @@ export default function AsignacionPage() {
       const res = await fetch('/api/asignacion', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usuariosHabilitados: selectedIds }),
+        body: JSON.stringify({ usuariosHabilitados: selectedIds, pesos }),
       })
       if (!res.ok) {
         const data = await res.json()
@@ -168,7 +179,8 @@ export default function AsignacionPage() {
           </h3>
           <p style={{ fontSize: '14px', color: '#6d28d9', margin: 0, lineHeight: '1.6' }}>
             Las consultas se asignan de forma alternada entre los usuarios habilitados.
-            Si hay 2 personas, la primera consulta va para una, la segunda para la otra, y así sucesivamente.
+            Cada persona tiene un <strong>peso</strong> que define cuántas consultas consecutivas recibe antes de pasar al siguiente.
+            Por ejemplo, si Andrea tiene peso 2 y Gonza peso 1: Andrea recibe 2, luego Gonza 1, y así.
             Cada tipo de solicitud (visitas y presupuestos) tiene su propio turno independiente.
           </p>
         </div>
@@ -293,13 +305,44 @@ export default function AsignacionPage() {
                     </p>
                   </div>
 
+                  {isSelected && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}
+                    >
+                      <span style={{ fontSize: '12px', color: '#64748b', whiteSpace: 'nowrap' }}>Consultas por turno:</span>
+                      <select
+                        value={pesos[user.id] || 1}
+                        onChange={(e) => updatePeso(user.id, parseInt(e.target.value))}
+                        style={{
+                          padding: '4px 8px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '6px',
+                          fontSize: '14px',
+                          fontWeight: 600,
+                          color: '#7c3aed',
+                          background: 'white',
+                          cursor: 'pointer',
+                          outline: 'none',
+                          width: '52px',
+                          textAlign: 'center'
+                        }}
+                      >
+                        {[1, 2, 3, 4, 5].map(n => (
+                          <option key={n} value={n}>{n}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
                   <span style={{
                     padding: '4px 12px',
                     borderRadius: '20px',
                     fontSize: '11px',
                     fontWeight: 500,
                     background: isSelected ? '#d1fae5' : '#fee2e2',
-                    color: isSelected ? '#065f46' : '#991b1b'
+                    color: isSelected ? '#065f46' : '#991b1b',
+                    flexShrink: 0
                   }}>
                     {isSelected ? 'Habilitado' : 'Deshabilitado'}
                   </span>

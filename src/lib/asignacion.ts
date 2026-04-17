@@ -1,6 +1,13 @@
 /**
- * Sistema de asignación round-robin para solicitudes.
- * Asigna consultas de forma alternada entre los usuarios habilitados (recibeConsultas = true).
+ * Sistema de asignación round-robin con pesos para solicitudes.
+ * Cada usuario tiene un "peso" que indica cuántas consultas consecutivas recibe
+ * antes de pasar al siguiente. Ejemplo con Andrea(2) y Gonza(1):
+ *   Consulta 1 → Andrea
+ *   Consulta 2 → Andrea
+ *   Consulta 3 → Gonza
+ *   Consulta 4 → Andrea
+ *   Consulta 5 → Andrea
+ *   Consulta 6 → Gonza
  */
 
 import { prisma } from './prisma'
@@ -10,17 +17,11 @@ interface AsignacionResult {
   nombre: string
 }
 
-/**
- * Obtiene el siguiente usuario en el turno round-robin para un tipo de solicitud.
- * La lógica es estrictamente secuencial: si el último fue Andrea, el siguiente es Gonza, y viceversa.
- * Si solo queda un usuario habilitado, siempre se le asigna a él.
- * Si no hay usuarios habilitados, retorna null.
- */
 export async function getNextAsignado(tipoSolicitud: 'visita' | 'presupuesto' | 'contacto'): Promise<AsignacionResult | null> {
-  // Obtener usuarios habilitados para recibir consultas, ordenados por nombre para consistencia
+  // Obtener usuarios habilitados, ordenados por nombre para consistencia
   const usuariosHabilitados = await prisma.user.findMany({
     where: { recibeConsultas: true },
-    select: { id: true, name: true },
+    select: { id: true, name: true, pesoAsignacion: true },
     orderBy: { name: 'asc' },
   })
 
@@ -34,24 +35,44 @@ export async function getNextAsignado(tipoSolicitud: 'visita' | 'presupuesto' | 
   })
 
   const ultimoId = turno?.ultimoUsuarioId
+  const contadorActual = turno?.contadorTurno ?? 0
 
-  // Encontrar el índice del último usuario asignado
-  let nextIndex = 0
-  if (ultimoId) {
-    const lastIndex = usuariosHabilitados.findIndex(u => u.id === ultimoId)
-    if (lastIndex >= 0) {
-      nextIndex = (lastIndex + 1) % usuariosHabilitados.length
+  let nextUser: typeof usuariosHabilitados[0]
+  let nuevoContador: number
+
+  if (!ultimoId) {
+    // Primera asignación: va al primer usuario
+    nextUser = usuariosHabilitados[0]
+    nuevoContador = 1
+  } else {
+    const currentIndex = usuariosHabilitados.findIndex(u => u.id === ultimoId)
+
+    if (currentIndex < 0) {
+      // El último usuario ya no está habilitado, empezar desde el primero
+      nextUser = usuariosHabilitados[0]
+      nuevoContador = 1
+    } else {
+      const currentUser = usuariosHabilitados[currentIndex]
+      const pesoActual = currentUser.pesoAsignacion || 1
+
+      if (contadorActual < pesoActual) {
+        // Todavía le toca al mismo usuario
+        nextUser = currentUser
+        nuevoContador = contadorActual + 1
+      } else {
+        // Pasar al siguiente
+        const nextIndex = (currentIndex + 1) % usuariosHabilitados.length
+        nextUser = usuariosHabilitados[nextIndex]
+        nuevoContador = 1
+      }
     }
-    // Si el último usuario ya no está habilitado, empieza desde 0
   }
-
-  const nextUser = usuariosHabilitados[nextIndex]
 
   // Actualizar el turno
   await prisma.asignacionTurno.upsert({
     where: { tipoSolicitud },
-    update: { ultimoUsuarioId: nextUser.id },
-    create: { tipoSolicitud, ultimoUsuarioId: nextUser.id },
+    update: { ultimoUsuarioId: nextUser.id, contadorTurno: nuevoContador },
+    create: { tipoSolicitud, ultimoUsuarioId: nextUser.id, contadorTurno: nuevoContador },
   })
 
   return {
