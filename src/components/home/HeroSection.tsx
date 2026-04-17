@@ -319,7 +319,7 @@ export default function HeroSection() {
                 ))}
               </ul>
               <Link 
-                href="/productos"
+                href="/cortinas/blackout"
                 className="inline-block mt-8 text-[13px] uppercase tracking-[0.3em] font-bold hover:opacity-70 transition-opacity"
               >
                 Más Info
@@ -352,7 +352,7 @@ export default function HeroSection() {
 
       {/* WhatsApp Button */}
       <a
-        href="https://wa.me/5491175191273?text=Hola, quiero más información sobre cortinas"
+        href="https://wa.me/5491122729695?text=Hola, quiero más información sobre cortinas"
         target="_blank"
         rel="noopener noreferrer"
         className="whatsapp-btn"

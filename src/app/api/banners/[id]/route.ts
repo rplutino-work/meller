@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, isErrorResponse } from '@/lib/auth-check'
 
 // GET - Obtener un banner específico
 export async function GET(
@@ -32,12 +33,15 @@ export async function GET(
   }
 }
 
-// PUT - Actualizar un banner
+// PUT - Actualizar un banner (solo admin)
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await requireAdmin()
+    if (isErrorResponse(authResult)) return authResult
+
     const { id } = await params
     const body = await request.json()
     const { titulo, subtitulo, imagen, features, ubicacion, categoria, orden, activo } = body
@@ -69,12 +73,15 @@ export async function PUT(
   }
 }
 
-// DELETE - Eliminar un banner
+// DELETE - Eliminar un banner (solo admin)
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await requireAdmin()
+    if (isErrorResponse(authResult)) return authResult
+
     const { id } = await params
     await prisma.heroBanner.delete({
       where: { id },

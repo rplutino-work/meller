@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, isErrorResponse } from '@/lib/auth-check'
 
-// GET - Obtener todos los banners
+// GET - Obtener todos los banners (público para el frontend)
 export async function GET() {
   try {
     const banners = await prisma.heroBanner.findMany({
@@ -25,9 +26,12 @@ export async function GET() {
   }
 }
 
-// POST - Crear un nuevo banner
+// POST - Crear un nuevo banner (solo admin)
 export async function POST(request: Request) {
   try {
+    const authResult = await requireAdmin()
+    if (isErrorResponse(authResult)) return authResult
+
     const body = await request.json()
     const { titulo, subtitulo, imagen, features, ubicacion, categoria, orden, activo } = body
 

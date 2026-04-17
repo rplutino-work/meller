@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, isErrorResponse } from '@/lib/auth-check'
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,6 +29,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await requireAdmin()
+    if (isErrorResponse(authResult)) return authResult
+
     const body = await request.json()
     const { clave, valor, tipo, activo } = body
 

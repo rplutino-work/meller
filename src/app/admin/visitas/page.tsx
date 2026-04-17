@@ -377,7 +377,7 @@ export default function VisitasPage() {
           <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0 }}>Intenta ajustar los filtros de búsqueda</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(340px, 100%), 1fr))', gap: '16px' }}>
           {filteredSolicitudes.map((solicitud) => {
             const estadoStyle = estadoColors[solicitud.estado]
             const EstadoIcon = estadoIcons[solicitud.estado] || Clock

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, isErrorResponse } from '@/lib/auth-check'
 
 // GET - Obtener un pago por ID
 export async function GET(
@@ -29,12 +30,15 @@ export async function GET(
   }
 }
 
-// PUT - Actualizar un pago
+// PUT - Actualizar un pago (solo admin)
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await requireAdmin()
+    if (isErrorResponse(authResult)) return authResult
+
     const { id } = await params
     const body = await request.json()
     const { cliente, idCliente, idPedido, monto, maxCuotas, estado } = body
@@ -77,12 +81,15 @@ export async function PUT(
   }
 }
 
-// DELETE - Eliminar un pago
+// DELETE - Eliminar un pago (solo admin)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await requireAdmin()
+    if (isErrorResponse(authResult)) return authResult
+
     const { id } = await params
     await prisma.pago.delete({
       where: { id },

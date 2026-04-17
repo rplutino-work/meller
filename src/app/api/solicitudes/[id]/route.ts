@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, isErrorResponse } from '@/lib/auth-check'
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await requireAdmin()
+    if (isErrorResponse(authResult)) return authResult
+
     const { id } = await params
     const body = await request.json()
     const { estado, notas, tipo } = body
@@ -39,6 +43,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await requireAdmin()
+    if (isErrorResponse(authResult)) return authResult
+
     const { id } = await params
     const { searchParams } = new URL(request.url)
     const tipo = searchParams.get('tipo')

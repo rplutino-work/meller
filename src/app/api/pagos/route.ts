@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { generatePaymentToken, createMercadoPagoPreference } from '@/lib/mercado-pago'
 import { createPrismaCheckout, isPrismaConfigured } from '@/lib/prisma-payments'
 import { createGetnetCheckout, isGetnetConfigured } from '@/lib/getnet'
+import { requireAdmin, isErrorResponse } from '@/lib/auth-check'
 
 // GET - Obtener todos los pagos (para admin) o un pago por token
 export async function GET(request: NextRequest) {
@@ -58,9 +59,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Crear un nuevo pago
+// POST - Crear un nuevo pago (solo admin)
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await requireAdmin()
+    if (isErrorResponse(authResult)) return authResult
+
     const body = await request.json()
     const { cliente, idCliente, idPedido, monto, maxCuotas, estado, metodoPago, proveedor } = body
 
