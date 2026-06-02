@@ -8,12 +8,7 @@ export default function BandasVerticalesPage() {
     '/images/cortinas/bandas-verticales/bandas-verticales-mele-roller-02.jpg',
     '/images/cortinas/bandas-verticales/bandas-verticales-mele-roller-03.jpg',
     '/images/cortinas/bandas-verticales/bandas-verticales-mele-roller-04.jpg',
-    '/images/cortinas/bandas-verticales/bandas-verticales-mele-roller-05.jpg',
-    '/images/cortinas/bandas-verticales/bandas-verticales-mele-roller-06.jpg',
-    '/images/cortinas/bandas-verticales/bandas-verticales-mele-roller-07.jpg',
-    '/images/cortinas/bandas-verticales/bandas-verticales-mele-roller-08.jpg',
-    '/images/cortinas/bandas-verticales/bandas-verticales-mele-roller-09.jpg',
-    '/images/cortinas/bandas-verticales/bandas-verticales-mele-roller-10.jpg'
+    '/images/cortinas/bandas-verticales/bandas-verticales-mele-roller-05.jpg'
   ].filter(Boolean)
 
   return (

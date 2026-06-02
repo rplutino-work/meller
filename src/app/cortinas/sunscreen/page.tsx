@@ -9,11 +9,7 @@ export default function SunScreenPage() {
     '/images/cortinas/sunscreen/cortina-roller-sunscreen-03.jpg',
     '/images/cortinas/sunscreen/cortina-roller-sunscreen-04.jpg',
     '/images/cortinas/sunscreen/cortina-roller-sunscreen-05.jpg',
-    '/images/cortinas/sunscreen/cortina-roller-sunscreen-06.jpg',
-    '/images/cortinas/sunscreen/cortina-roller-sunscreen-07.jpg',
-    '/images/cortinas/sunscreen/cortina-roller-sunscreen-08.jpg',
-    '/images/cortinas/sunscreen/cortina-roller-sunscreen-09.jpg',
-    '/images/cortinas/sunscreen/cortina-roller-sunscreen-10.jpg'
+    '/images/cortinas/sunscreen/cortina-roller-sunscreen-06.jpg'
   ].filter(Boolean)
 
   return (
