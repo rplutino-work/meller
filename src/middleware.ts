@@ -1,6 +1,5 @@
 import { auth } from "@/auth"
 import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
 
 // Countries that are actual customers (Argentina + neighbors + relevant)
 const ALLOWED_COUNTRIES = new Set([
@@ -20,7 +19,7 @@ const ALLOWED_COUNTRIES = new Set([
 ])
 
 function isBlockedTraffic(req: NextRequest): boolean {
-  const country = req.headers.get('x-vercel-ip-country') || req.geo?.country
+  const country = req.headers.get('x-vercel-ip-country')
   // If no country info, allow through
   if (!country) return false
   // Block if not in allowed list
