@@ -378,7 +378,7 @@ export default function Footer() {
             boxSizing: 'border-box'
           }}
         >
-          <div 
+          <div
             className="col-md-12 text-center"
             style={{
               flex: '0 0 100%',
@@ -389,9 +389,7 @@ export default function Footer() {
               textAlign: 'center'
             }}
           >
-            {/* Logo de agencia oculto temporalmente */}
-            {/* <div
-              className="line"
+            <div
               style={{
                 background: '#555555',
                 height: '0.025em',
@@ -399,19 +397,29 @@ export default function Footer() {
                 marginBottom: '12px'
               }}
             />
-            <a 
-              href="http://adniverse.ar/" 
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: 'inline-block' }}
-            >
-              <img 
-                src="/images/adniverse.svg" 
-                alt="Adniverse" 
-                width={90}
-                style={{ display: 'block', margin: '0 auto' }}
-              />
-            </a> */}
+            <p style={{
+              fontSize: '12px',
+              fontWeight: 300,
+              color: 'rgb(100, 100, 100)',
+              margin: 0,
+              fontFamily: 'Oswald, sans-serif'
+            }}>
+              Desarrollado por{' '}
+              <a
+                href="https://rok.com.ar"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: 'rgb(140, 140, 140)',
+                  textDecoration: 'none',
+                  transition: 'color 0.3s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
+                onMouseLeave={(e) => e.currentTarget.style.color = 'rgb(140, 140, 140)'}
+              >
+                rok.studio
+              </a>
+            </p>
           </div>
         </div>
       </div>
