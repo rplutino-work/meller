@@ -16,7 +16,9 @@ export async function GET() {
       features: JSON.parse(banner.features || '[]'),
     }))
 
-    return NextResponse.json(bannersWithFeatures)
+    return NextResponse.json(bannersWithFeatures, {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' },
+    })
   } catch (error) {
     console.error('Error fetching banners:', error)
     return NextResponse.json(
