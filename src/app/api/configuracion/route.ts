@@ -1,25 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { revalidateTag } from 'next/cache'
 import { requireAdmin, isErrorResponse } from '@/lib/auth-check'
+import { getCachedConfigByKey, getCachedConfigAll } from '@/lib/cached-queries'
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const clave = searchParams.get('clave')
 
-    const cacheHeaders = { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' }
-
     if (clave) {
-      const config = await prisma.configuracion.findUnique({
-        where: { clave },
-      })
-      return NextResponse.json(config, { headers: cacheHeaders })
+      const config = await getCachedConfigByKey(clave)
+      return NextResponse.json(config)
     }
 
-    const configs = await prisma.configuracion.findMany({
-      where: { activo: true },
-    })
-    return NextResponse.json(configs, { headers: cacheHeaders })
+    const configs = await getCachedConfigAll()
+    return NextResponse.json(configs)
   } catch (error) {
     console.error('Error fetching configuracion:', error)
     return NextResponse.json(
@@ -59,6 +55,8 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    revalidateTag('configuracion', 'max')
+
     return NextResponse.json(config)
   } catch (error) {
     console.error('Error saving configuracion:', error)
@@ -68,7 +66,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-
-
-
-

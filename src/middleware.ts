@@ -1,5 +1,5 @@
 import { auth } from "@/auth"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 
 // Countries that are actual customers (Argentina + neighbors + relevant)
 const ALLOWED_COUNTRIES = new Set([

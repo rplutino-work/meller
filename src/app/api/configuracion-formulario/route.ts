@@ -1,25 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { revalidateTag } from 'next/cache'
 import { requireAdmin, isErrorResponse } from '@/lib/auth-check'
+import { getCachedFormConfig, getCachedFormConfigAll } from '@/lib/cached-queries'
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const nombre = searchParams.get('nombre')
 
-    const cacheHeaders = { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' }
-
     if (nombre) {
-      const config = await prisma.configuracionFormulario.findUnique({
-        where: { nombreFormulario: nombre },
-      })
-      return NextResponse.json(config || null, { headers: cacheHeaders })
+      const config = await getCachedFormConfig(nombre)
+      return NextResponse.json(config || null)
     }
 
-    const configs = await prisma.configuracionFormulario.findMany({
-      orderBy: { nombreFormulario: 'asc' },
-    })
-    return NextResponse.json(configs, { headers: cacheHeaders })
+    const configs = await getCachedFormConfigAll()
+    return NextResponse.json(configs)
   } catch (error) {
     console.error('Error fetching form config:', error)
     return NextResponse.json(
@@ -61,6 +57,8 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    revalidateTag('form-config', 'max')
+
     return NextResponse.json(config)
   } catch (error) {
     console.error('Error saving form config:', error)
@@ -70,4 +68,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-

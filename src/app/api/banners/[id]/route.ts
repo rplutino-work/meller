@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { revalidateTag } from 'next/cache'
 import { requireAdmin, isErrorResponse } from '@/lib/auth-check'
 
-// GET - Obtener un banner específico
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -33,7 +33,6 @@ export async function GET(
   }
 }
 
-// PUT - Actualizar un banner (solo admin)
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -60,6 +59,8 @@ export async function PUT(
       },
     })
 
+    revalidateTag('banners', 'max')
+
     return NextResponse.json({
       ...banner,
       features: JSON.parse(banner.features),
@@ -73,7 +74,6 @@ export async function PUT(
   }
 }
 
-// DELETE - Eliminar un banner (solo admin)
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -87,6 +87,8 @@ export async function DELETE(
       where: { id },
     })
 
+    revalidateTag('banners', 'max')
+
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting banner:', error)
@@ -96,4 +98,3 @@ export async function DELETE(
     )
   }
 }
-

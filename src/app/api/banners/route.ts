@@ -1,24 +1,13 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { revalidateTag } from 'next/cache'
 import { requireAdmin, isErrorResponse } from '@/lib/auth-check'
+import { getCachedBanners } from '@/lib/cached-queries'
 
-// GET - Obtener todos los banners (público para el frontend)
 export async function GET() {
   try {
-    const banners = await prisma.heroBanner.findMany({
-      where: { activo: true },
-      orderBy: { orden: 'asc' },
-    })
-
-    // Parsear el JSON de features
-    const bannersWithFeatures = banners.map(banner => ({
-      ...banner,
-      features: JSON.parse(banner.features || '[]'),
-    }))
-
-    return NextResponse.json(bannersWithFeatures, {
-      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' },
-    })
+    const banners = await getCachedBanners()
+    return NextResponse.json(banners)
   } catch (error) {
     console.error('Error fetching banners:', error)
     return NextResponse.json(
@@ -28,7 +17,6 @@ export async function GET() {
   }
 }
 
-// POST - Crear un nuevo banner (solo admin)
 export async function POST(request: Request) {
   try {
     const authResult = await requireAdmin()
@@ -50,6 +38,8 @@ export async function POST(request: Request) {
       },
     })
 
+    revalidateTag('banners', 'max')
+
     return NextResponse.json({
       ...banner,
       features: JSON.parse(banner.features),
@@ -62,4 +52,3 @@ export async function POST(request: Request) {
     )
   }
 }
-
